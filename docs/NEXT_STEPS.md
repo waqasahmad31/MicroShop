@@ -1,8 +1,7 @@
 # Next steps
 
-Phase 0 is complete. Next: Phase 1 — Solution skeleton.
-1. Create MicroShop.sln and the documented 23 source projects plus architecture tests.
-2. Add the specified project references and minimal API/Gateway/Blazor hosts.
-3. Verify restore, build, dependency direction, absence of cycles and host startup.
-4. Update the phase record and persistent documentation with actual results.
-5. Stop after Phase 1. Do not implement infrastructure or business features yet.
+Phases 0–1 are complete. Stop until Phase 2 is authorized.
+Then add infrastructure-only PostgreSQL/RabbitMQ Compose services, environment examples,
+four restricted database owner logins and databases, and local configuration documentation.
+Verify actual authentication, cross-database denial, broker access, persistence and clean initialization.
+Update the handoff and stop before Phase 3 Catalog. Do not add persistence packages or business code in Phase 2.

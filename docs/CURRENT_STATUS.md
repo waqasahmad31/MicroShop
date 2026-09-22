@@ -1,12 +1,19 @@
 # Current status
 
 Last updated: 2026-09-22 (Asia/Karachi)
-Phase 0: COMPLETED. Phase 1: NOT STARTED. Later phases: NOT STARTED.
+Phases 0 and 1: COMPLETED. Phase 2: NOT STARTED.
 
-Architecture, ownership, dependencies, packages, ports and the incremental roadmap are documented.
-Workspace inspection found no existing MicroShop project or parent Git repository.
-.NET SDK 10.0.302 is available; dotnet --info has a workload-metadata diagnostic failure.
-Docker Linux engine was unavailable during the initial planning inspection.
-No application code, databases, migrations, business APIs or tests exist at this checkpoint.
-Build/test status: not applicable until the Phase 1 skeleton exists.
-Next: create the Phase 1 projects and verify restore/build, references and runnable hosts.
+MicroShop.sln contains 23 source projects and one xUnit architecture test project.
+Four layered service skeletons, Notification, YARP and Blazor Web/Client are present.
+Domain and BuildingBlocks contain no speculative business classes or infrastructure code.
+
+Verified at the skeleton checkpoint:
+- dotnet restore MicroShop.sln: succeeded.
+- dotnet build MicroShop.sln --no-restore: 0 warnings, 0 errors.
+- dotnet test MicroShop.sln --no-build --no-restore: 4 passed, 0 failed, 0 skipped.
+- scripts/Test-Skeleton.ps1: all seven hosts passed HTTP/bootstrap checks.
+
+Browser execution was not automated. No database, migrations, Docker Compose,
+MudBlazor business UI, authentication or messaging implementation exists yet.
+The dotnet --info workload diagnostic failed, but actual restore/build/tests passed.
+Next: Phase 2 development infrastructure after an instruction to continue.

@@ -87,7 +87,7 @@ Dependencies: Repository and requirement inspection.
 Record: [phase-00-planning.md](phases/phase-00-planning.md)
 
 ### Phase 01 — Solution skeleton
-Status: **NOT STARTED**
+Status: **COMPLETED**
 
 Deliverables: MicroShop.sln, 23 source projects, architecture test project, basic hosts, explicit references and initial README.
 
