@@ -99,7 +99,9 @@ public sealed class ProjectBoundaryTests
             ["MicroShop.Contracts"] = [],
             ["MicroShop.Messaging"] = [],
             ["MicroShop.Observability"] = [],
-            ["MicroShop.Architecture.Tests"] = []
+            ["MicroShop.Architecture.Tests"] = [],
+            ["Catalog.Unit.Tests"] = ["Catalog.Application", "Catalog.Domain"],
+            ["Catalog.Integration.Tests"] = ["Catalog.Api", "Catalog.Application", "Catalog.Infrastructure"]
         };
 
         foreach (var service in Services)
@@ -141,4 +143,3 @@ public sealed class ProjectBoundaryTests
         throw new InvalidOperationException("Run architecture tests from a checkout containing MicroShop.sln.");
     }
 }
-

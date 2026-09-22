@@ -1,4 +1,4 @@
-#requires -Version 7.0
+#requires -Version 7.3
 [CmdletBinding()]
 param()
 
@@ -32,9 +32,16 @@ foreach ($hostToCheck in $hostsToCheck) {
 
     $stdout = Join-Path $logDirectory "$($hostToCheck.Name).stdout.log"
     $stderr = Join-Path $logDirectory "$($hostToCheck.Name).stderr.log"
-    $process = Start-Process -FilePath 'dotnet' -ArgumentList @(
-        'run', '--project', $hostToCheck.Project, '--no-build', '--no-restore', '--launch-profile', 'http'
-    ) -WorkingDirectory $repoRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+    $previousDatabase = $env:ConnectionStrings__Database
+    try {
+        if ($hostToCheck.Name -eq 'Catalog') {
+            & "$PSScriptRoot/Set-ServiceEnvironment.ps1" -Service Catalog
+        }
+        $process = Start-Process -FilePath 'dotnet' -ArgumentList @(
+            'run', '--project', $hostToCheck.Project, '--no-build', '--no-restore', '--launch-profile', 'http'
+        ) -WorkingDirectory $repoRoot -WindowStyle Hidden -PassThru -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+    }
+    finally { $env:ConnectionStrings__Database = $previousDatabase }
 
     try {
         $url = "http://localhost:$port"
@@ -67,7 +74,8 @@ foreach ($hostToCheck in $hostsToCheck) {
         }
         else {
             $identity = $response.Content | ConvertFrom-Json
-            if ($identity.service -ne $hostToCheck.Name -or $identity.phase -ne 'Solution skeleton') {
+            $expectedPhase = if ($hostToCheck.Name -eq 'Catalog') { 'Catalog' } else { 'Solution skeleton' }
+            if ($identity.service -ne $hostToCheck.Name -or $identity.phase -ne $expectedPhase) {
                 throw "Unexpected identity response on port $port."
             }
         }
@@ -84,6 +92,14 @@ foreach ($hostToCheck in $hostsToCheck) {
                 throw 'Gateway unexpectedly has a business route before Phase 7.'
             }
         }
+        if ($hostToCheck.Name -eq 'Catalog') {
+            $products = Invoke-RestMethod -Uri "$url/api/catalog/products?pageSize=2" -TimeoutSec 5
+            if ($products.pageSize -ne 2 -or $null -eq $products.totalCount) {
+                throw 'Catalog did not return a paginated database result.'
+            }
+            $swagger = Invoke-WebRequest -Uri "$url/swagger/index.html" -TimeoutSec 5
+            if ($swagger.Content -notmatch 'swagger-ui') { throw 'Catalog Swagger UI is unavailable.' }
+        }
 
         Write-Output "PASS $($hostToCheck.Name) ($url)"
     }
@@ -95,4 +111,4 @@ foreach ($hostToCheck in $hostsToCheck) {
     }
 }
 
-Write-Output 'Seven hosts passed. This checks HTTP/bootstrap delivery, not browser execution or business features.'
+Write-Output 'Seven hosts passed, including a Catalog database read and Swagger delivery. Browser execution is not covered.'

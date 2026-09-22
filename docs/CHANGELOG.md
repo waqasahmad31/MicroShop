@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-22 — Phase 3
+- Implemented Catalog product/category CRUD, domain validation and application use cases.
+- Added EF Core writes/migration, parameterized Dapper details/search/pagination and database constraints.
+- Added ProblemDetails, Development Swagger UI and explicit repeatable seed with deterministic IDs.
+- Applied migration only to catalog_db; seeded 2 categories/5 products without resetting volumes.
+- Added 9 unit/application and 17 real PostgreSQL integration tests; all 30 tests including architecture pass.
+- Verified full build with zero warnings/errors, model/migration agreement and all seven HTTP hosts.
+- Added Catalog/data-ownership/EF-Dapper guides and ADR-015; updated persistent handoff; stopped before Phase 4.
+
 ## 2026-09-22 — Future learning roadmap (documentation only)
 - Extended the canonical roadmap with FUTURE / NOT STARTED Aspire/Azure Phases 19–28.
 - Separated local/core Phases 0–18 from cloud learning and a later Kubernetes/AKS track.

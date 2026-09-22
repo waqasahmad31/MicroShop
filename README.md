@@ -1,8 +1,8 @@
 # MicroShop
 
 A step-by-step .NET 10 microservices learning project. This repository currently contains the
-Phase 0 architecture plan, Phase 1 solution skeleton and verified Phase 2 development infrastructure.
-Business features arrive in later phases.
+Phase 0 architecture plan, Phase 1 skeleton, verified Phase 2 infrastructure and Phase 3 Catalog service.
+Catalog provides product/category CRUD, EF writes, Dapper reads, validation, migrations and development seeds.
 
 Start with [the implementation plan](docs/IMPLEMENTATION_PLAN.md),
 [current status](docs/CURRENT_STATUS.md) and [next steps](docs/NEXT_STEPS.md).
@@ -33,23 +33,26 @@ Each service owns its data. EF Core handles commands and Dapper handles read pro
 HTTP and integration events cross service boundaries; SQL queries and domain entities do not.
 See [architecture](docs/ARCHITECTURE.md) for dependency, authentication and order-flow diagrams.
 
-## Run the skeleton
+## Build and run
 
 Prerequisites: .NET SDK 10.0.302 (or a later patch in that feature band), Git, and a modern browser.
-The skeleton runs without dependencies. Phase 2 infrastructure requires Docker with a running Linux
-engine and Compose v2; database migrations and seed data do not exist yet.
+Catalog requires Docker with a running Linux engine and Compose v2 for PostgreSQL.
+Other hosts are still skeletons. First prepare the development infrastructure below, then follow
+[the Catalog guide](docs/catalog.md) to apply its migration and seed.
 
 From this directory:
 
 ```powershell
 dotnet restore MicroShop.sln
 dotnet build MicroShop.sln --no-restore
-dotnet test MicroShop.sln --no-build --no-restore
+./scripts/Test-Catalog.ps1
 ```
 
-Verified Phase 1 result: restore succeeded, build had **0 warnings/errors**, and **4 architecture tests passed**.
-On Windows with PowerShell 7, run `./scripts/Test-Skeleton.ps1` after building to check all seven hosts.
-The script verifies HTTP/OpenAPI/bootstrap delivery and stops hosts afterward; it does not automate a browser.
+Verified Phase 3 result: build had **0 warnings/errors** and **30 tests passed** (4 architecture,
+9 unit/application, 17 real PostgreSQL integration). The test script needs local `.env` and running PostgreSQL.
+On Windows with PowerShell 7.3+, run `./scripts/Test-Skeleton.ps1` after building/applying the Catalog migration.
+It checks all seven hosts, including a Catalog database read/Swagger, and stops hosts afterward.
+It verifies HTTP/bootstrap delivery without automating a browser.
 
 Open MicroShop.sln in an IDE with .NET 10 support, or run any host independently in a terminal:
 
@@ -57,13 +60,16 @@ Open MicroShop.sln in an IDE with .NET 10 support, or run any host independently
 dotnet run --project src/Web/MicroShop.Web --launch-profile http
 dotnet run --project src/Gateway/MicroShop.Gateway --launch-profile http
 dotnet run --project src/Services/Identity/Identity.Api --launch-profile http
+# Set in Catalog's terminal before launching it:
+./scripts/Set-ServiceEnvironment.ps1 -Service Catalog
 dotnet run --project src/Services/Catalog/Catalog.Api --launch-profile http
 dotnet run --project src/Services/Inventory/Inventory.Api --launch-profile http
 dotnet run --project src/Services/Ordering/Ordering.Api --launch-profile http
 dotnet run --project src/Services/Notification/Notification.Service --launch-profile http
 ```
 
-Use separate terminals for simultaneous hosts. No startup order is required for this skeleton.
+Use separate terminals for simultaneous hosts; set only each service's own environment in its terminal.
+Start PostgreSQL and apply the Catalog migration before accessing Catalog data.
 The Client project is served by the Web host; do not launch it separately.
 
 | Host | URL | Available now |
@@ -71,13 +77,13 @@ The Client project is served by the Web host; do not launch it separately.
 | Web | http://localhost:5100 | Skeleton page in Interactive WebAssembly |
 | Gateway | http://localhost:5200 | Host identification JSON; no service routes yet |
 | Identity | http://localhost:5210 | Host identification JSON; OpenAPI JSON |
-| Catalog | http://localhost:5220 | Host identification JSON; OpenAPI JSON |
+| Catalog | http://localhost:5220 | Product/category CRUD; OpenAPI JSON; `/swagger` |
 | Inventory | http://localhost:5230 | Host identification JSON; OpenAPI JSON |
 | Ordering | http://localhost:5240 | Host identification JSON; OpenAPI JSON |
 | Notification | http://localhost:5250 | Host identification JSON; no consumer yet |
 
 In Development, each of the four APIs serves `/openapi/v1.json`.
-Swagger UI is not installed yet; it is added alongside API features. There is no `/swagger` page now.
+Catalog additionally serves Swagger UI at `/swagger`; the other APIs have JSON documents only.
 Gateway `/api/*` routes start in Phase 7. Health checks start in Phase 15; `/` is not a readiness check.
 
 ## Development infrastructure
@@ -100,19 +106,19 @@ Four databases each have their own restricted login; all 12 cross-service connec
 Both named volumes survived container recreation; a fresh-volume reset was also verified.
 
 Use `docker compose down` to stop while retaining data. `docker compose down -v` deliberately deletes it.
-No persistence packages, tables, migrations or event code have been added.
+Catalog's migration creates its own tables. Other service databases remain empty; no event code exists yet.
 
 ## Projects and references
 
-There are 23 source projects and one xUnit architecture test project.
+There are 23 source projects and three test projects (architecture, Catalog unit/application and integration).
 Each of Identity, Catalog, Inventory and Ordering has Api, Application, Domain and Infrastructure projects.
 Api references Application and Infrastructure; Application references Domain;
 Infrastructure references Application and Domain. No cross-service project references.
 Web references Web.Client. Gateway, Notification and the three BuildingBlocks start without project references.
 Architecture tests inspect the project graph without referencing service assemblies.
 
-Domain/Application/Infrastructure and BuildingBlocks libraries intentionally contain no placeholder classes.
-They establish the requested boundaries; use cases, interfaces and persistence arrive with real features.
+Catalog now implements its four layers. Other service libraries and BuildingBlocks contain no placeholder classes;
+their use cases and persistence arrive in later phases.
 See [BuildingBlocks boundaries](src/BuildingBlocks/README.md) and
 [the project/package map](docs/IMPLEMENTATION_PLAN.md).
 The [Phase 1 inventory](docs/PROJECT_STRUCTURE.md) lists every created file and project reference.
@@ -137,4 +143,4 @@ Actual restore/build/test results are recorded in [current status](docs/CURRENT_
 Docker's Linux engine is now running and both Phase 2 containers are healthy.
 Expected negative permission checks may appear as PostgreSQL connection errors in logs.
 
-Phase 2 is complete. Phase 3 Catalog is next and requires an instruction to continue.
+Phases 0–3 are complete. Phase 4 Inventory is next and requires an instruction to continue.

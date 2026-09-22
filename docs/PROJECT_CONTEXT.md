@@ -35,9 +35,10 @@ Business pages arrive in Phase 8, security in Phase 9, messaging in Phase 10, ob
 Earlier phases are local exercises with documented limitations, not secure or reliable deployment claims.
 
 ## Authorization and continuation
-Phases 0–2 are complete. Current implementation state: waiting to begin Phase 3 — Catalog Microservice.
-Current work is documentation-only roadmap maintenance and initial GitHub publication, not application/cloud implementation.
-Do not start Phase 3 automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
+Phases 0–3 are complete. Catalog implements product/category CRUD with EF writes and Dapper reads,
+real PostgreSQL tests, explicit migration and development seed commands. The public repository is
+https://github.com/waqasahmad31/MicroShop, with detailed phase-wise commits.
+Do not start Phase 4 Inventory automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
 
 ## Long-term learning roadmap (future context only)
 - LOCAL / CORE MICROSERVICES LEARNING: Phases 0–18 retain the explicit local architecture.

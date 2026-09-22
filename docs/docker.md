@@ -232,6 +232,11 @@ Use reset only when MicroShop's data is disposable. Do not use Docker system pru
 | docker compose down -v | Removed | Removed for this Compose project |
 
 ## Sources
+
+Phase 3 note: Catalog now owns persistent application tables. After an intentional full reset,
+follow [the Catalog guide](catalog.md) to reapply its migration and seed. Ordinary startup and tests
+do not reset volumes; integration tests use disposable schemas within catalog_db.
+
 - [Official PostgreSQL image documentation](https://github.com/docker-library/docs/blob/master/postgres/README.md):
   bootstrap environment/empty-data initialization and volume layout.
 - [PostgreSQL privileges](https://www.postgresql.org/docs/17/ddl-priv.html):

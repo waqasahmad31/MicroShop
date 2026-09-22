@@ -184,8 +184,14 @@ access is revoked and only the matching owner is granted access; the bootstrap m
 separate from application credentials. All 12 cross-service connection attempts are verified denied.
 Volumes are microshop_postgres_data and microshop_rabbitmq_data; RabbitMQ keeps a stable hostname.
 Bootstrap scripts create no application tables. See [Docker runbook](docker.md) for actual lifecycle tests.
-ConnectionStrings__Database is the future per-service setting, prepared by Set-ServiceEnvironment.ps1;
-the current skeleton does not consume it yet. No dependency packages or application code were changed.
+ConnectionStrings__Database is the per-service setting, prepared by Set-ServiceEnvironment.ps1.
+Catalog now consumes and validates it; other service skeletons do not consume database settings yet.
+Phase 3 adds Product/Category, CatalogService, command-specific ICatalogWriter/EfCatalogWriter,
+ICatalogReader/DapperCatalogReader and CatalogDbContext. Domain/Application remain package-free.
+Only catalog_db has application tables; category/product foreign keys stay inside Catalog.
+Migrations and Development seeding run explicitly, not during HTTP startup. Tests use real PostgreSQL
+with isolated disposable schemas. See [Catalog guide](catalog.md), [database ownership](database-ownership.md)
+and [EF/Dapper data flow](efcore-vs-dapper.md); ADR-015 records validation/concurrency decisions.
 Phase 16: add seven application hosts (four APIs, Notification, Gateway, Web); internal HTTP port 8080,
 service DNS and environment configuration. Client is a build artifact hosted by Web, not another container.
 Use internal service URLs inside containers and host-accessible URLs in browser configuration.

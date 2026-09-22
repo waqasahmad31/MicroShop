@@ -1,7 +1,7 @@
 # Implementation plan
 
-Canonical roadmap. Last updated: 2026-09-22. Phases 0–2 are complete; waiting to begin Phase 3.
-Current authorization: documentation-only roadmap extension. No implementation phase is authorized by this update.
+Canonical roadmap. Last updated: 2026-09-22. Phases 0–3 are complete; waiting to begin Phase 4.
+Completed authorized work: Phase 3 Catalog. Stop before Phase 4 until instructed to continue.
 Status vocabulary: NOT STARTED, IN PROGRESS, COMPLETED, BLOCKED. Completed phases stay in this file.
 Each phase requires relevant build/tests plus the end-of-phase documentation updates in AGENTS.md.
 
@@ -15,7 +15,7 @@ The intended progression is local fundamentals -> explicit microservice architec
 observability -> .NET Aspire -> Azure managed services -> Infrastructure as Code -> CI/CD ->
 advanced Azure services -> Kubernetes/AKS later.
 Docker and observability develop incrementally in the existing phases; this summary does not renumber them.
-**Phase 3 — Catalog Microservice remains the next implementation phase.**
+**Phase 4 — Inventory Microservice is the next implementation phase.**
 Future phases extend the project; they neither replace its local architecture nor authorize early cloud work.
 
 ## Repository layout
@@ -35,7 +35,8 @@ MicroShop/
       Ordering/Ordering.Api, Ordering.Application, Ordering.Domain, Ordering.Infrastructure
       Notification/Notification.Service
     BuildingBlocks/Contracts, Messaging, Observability
-  tests/MicroShop.Architecture.Tests
+  tests/MicroShop.Architecture.Tests, Catalog.Unit.Tests, Catalog.Integration.Tests
+  .config/dotnet-tools.json (dotnet-ef 10.0.12)
   docs/ (context, architecture, roadmap, status, next steps, ADRs, changelog, phases)
   docker-compose.yml / .env.example (Phase 2)
 ```
@@ -68,7 +69,11 @@ Use matching stable 10.0.x Microsoft ASP.NET packages and EF/Npgsql provider maj
 ASP.NET Core health checks, logging, configuration and ProblemDetails use the shared framework.
 EF CLI tool is introduced with migrations and pinned in a local tool manifest.
 Package versions above were checked against the NuGet flat-container index during Phase 0; restore/build
-must confirm compatibility. Later packages are deliberately not installed now.
+must confirm compatibility. The table preserves the baseline/future map; Phase 3 adds these concrete packages:
+Catalog.Infrastructure uses EF Core/Relational/Design 10.0.12 (Design private), Npgsql/provider 10.0.3
+and Dapper 2.1.86. Catalog.Api adds SwaggerUI 10.2.3. Catalog.Integration.Tests uses Mvc.Testing 10.0.12;
+both Catalog test projects use the existing xUnit/Test SDK versions. Domain/Application remain package-free.
+Relational is pinned explicitly to avoid a transitive 10.0.4/10.0.12 assembly conflict.
 
 ## Ports, databases and infrastructure
 Web 5100; Gateway 5200; Identity 5210; Catalog 5220; Inventory 5230; Ordering 5240; Notification 5250.
@@ -121,7 +126,7 @@ Dependencies: Phase 01 completed.
 Record: [phase-02-infrastructure.md](phases/phase-02-infrastructure.md)
 
 ### Phase 03 — Catalog microservice
-Status: **NOT STARTED**
+Status: **COMPLETED**
 
 Deliverables: Products/categories, validation, EF DbContext/configurations/migrations and writes, Dapper pagination/search/details, OpenAPI UI and development seed data.
 

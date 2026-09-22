@@ -134,3 +134,28 @@ Relationship to prior decisions: extends ADR-007/010's learning and handoff scop
 local architecture or ADR-001/003/004/009/013. No existing architecture decision is silently reversed.
 Validation for this change: document consistency, phase status/order, preserved local phases and unchanged
 non-documentation project files. No cloud implementation or Phase 3 business functionality is part of this update.
+
+## ADR-015 — Catalog persistence, validation and verification
+Date: 2026-09-22.
+Context: implement the first business service while keeping Domain/Application independent and preserving
+the four-layer learning architecture and separate database ownership.
+Decision: Domain Product/Category enforce invariants; CatalogService coordinates use cases through
+ICatalogReader and an atomic command-specific ICatalogWriter. Infrastructure supplies Dapper projections,
+EF writes and an explicit migration. This is not a generic repository or a new framework.
+Category names use trimmed invariant uppercase uniqueness; a database index handles concurrent duplicates.
+Products require an existing category; a local FK restricts deletion, including validation/write races.
+Price uses decimal/numeric(10,2), accepts zero, rejects excess precision/range and uses one USD currency.
+PUT replaces validated fields with last-write-wins; absent/deleted rows return 404. Constraint conflicts
+return 409; invalid input returns 400 ProblemDetails with traceId. Unknown failures expose no internal details.
+Migration/seed commands are explicit; seed is Development-only, transactional, deterministic and preserves edits.
+Real PostgreSQL integration tests use generated schemas and independent migration histories, then clean up.
+Reason: make the request/data flow visible and test provider-specific SQL/constraints without touching local seed data.
+Alternatives considered: DbContext in Application (couples the layer), generic repositories/CQRS framework
+(unnecessary), in-memory-only integration tests (miss PostgreSQL behavior), automatic startup migration/seed
+(hides database operations), hard deletes cascading from categories (surprising product loss).
+Consequences: EF command lookups/seed checks are allowed; API query projections remain Dapper. Writes have no
+optimistic version tokens. List count/page can drift under concurrent changes. Seed jobs run sequentially.
+Tests require local PostgreSQL and schema-creation rights in catalog_db; an interrupted process can leave a
+disposable schema to inspect/clean. Authentication remains Phase 9. Future stock ownership stays with Inventory.
+Validation: 30 tests passed, including concurrent duplicate rejection, CRUD, input errors, literal search,
+isolated migration and repeatable seed; all seven HTTP hosts passed. Migration touched Catalog only.
