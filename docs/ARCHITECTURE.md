@@ -197,6 +197,29 @@ Choose the smallest suitable local OTLP viewer at Phase 15 and document that add
 HTTP trace propagation is automatic where instrumented; message headers need explicit context propagation.
 A browser-to-gateway parent span needs explicit browser-side work; do not claim it solely from backend tracing.
 
+## FUTURE / TARGET CLOUD ARCHITECTURE — NOT STARTED
+
+This is learning-roadmap context only. The current local architecture, projects and deployment files are unchanged.
+Phases 0–18 must be learned first; no Aspire or Azure implementation is present.
+
+| Future phase | Planned extension/comparison | Boundary to preserve |
+|---|---|---|
+| 19: Aspire | AppHost, Service Defaults, discovery, configuration, Dashboard and telemetry | Explicit Compose/Docker concepts remain understandable |
+| 20: Azure foundation | Resource model, access, environments, naming/tagging and cost | Understand the platform before application migration |
+| 21: ACR / Container Apps | Registry/image lifecycle and existing container deployment | Reuse existing services; no Azure-specific redesign |
+| 22: Azure PostgreSQL | Flexible Server, connectivity/migrations/backups | identity_db, catalog_db, inventory_db, ordering_db retain separate ownership |
+| 23: Service Bus | Alternative IEventBus provider alongside RabbitMQ | Preserve events and Outbox/Inbox reasoning; document broker-semantic differences |
+| 24: Key Vault / Managed Identity | Appropriate secret/identity access and RBAC | Distinguish local credentials from cloud identities; no committed secrets |
+| 25: Azure observability | Monitor, Application Insights, Log Analytics and KQL | Reuse OpenTelemetry; compare with local Aspire Dashboard |
+| 26: Bicep / azd | Repeatable parameterized infrastructure | Portal exploration cannot be the final provisioning dependency |
+| 27: CI/CD | One primary GitHub Actions or Azure DevOps path | Build/test/image/deploy/verify with environment separation and rollback |
+| 28: Advanced Azure | API Management, Entra ID, App Configuration/flags, private networking, scaling/security | Retain YARP initially and compare responsibilities before changes |
+
+Conceptual future messaging options are IEventBus -> RabbitMqEventBus or AzureServiceBusEventBus;
+none of those implementations is introduced by this roadmap change.
+Kubernetes/AKS is a separate later track; Dapr/service mesh are optional later topics, not core dependencies.
+See IMPLEMENTATION_PLAN.md and ADR-014 for the ordered prerequisites and scope boundaries.
+
 ## Sources consulted for planning
 - [Blazor render modes](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-10.0)
 - [YARP getting started](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/getting-started?view=aspnetcore-10.0)

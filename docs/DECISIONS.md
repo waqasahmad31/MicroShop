@@ -111,3 +111,26 @@ still has cluster-wide access. down keeps data; down -v destroys this project's 
 do not prove credentials/isolation, so a repeatable verifier makes actual TCP/SQL/HTTP/AMQP checks.
 Validation: four own logins, four wrong-password denials, 12 cross-service denials; persistence and clean
 initialization passed; both containers healthy. This refines ADR-001/009, without changing service architecture.
+
+## ADR-014 — Extend the roadmap after local fundamentals
+Date: 2026-09-22.
+Context: preserve long-term distributed-development and Azure learning for a developer without prior conversation context.
+The local/core roadmap ends at Phase 18, while the implemented repository is complete only through Phase 2.
+Decision: keep Phases 0–18 unchanged; append FUTURE / NOT STARTED Phases 19–28 for Aspire, Azure foundation,
+ACR/Container Apps, Azure PostgreSQL, Service Bus, Key Vault/Managed Identity, Azure observability, Bicep/azd,
+one CI/CD platform and advanced Azure services. Keep Kubernetes/AKS as a separate later track;
+Dapr/service mesh remain potential later topics, not core dependencies.
+Reason: learn explicit Docker/network/configuration/service boundaries before higher-level orchestration
+and managed services, and preserve this order in the repository rather than relying on conversation history.
+Alternatives considered: introduce Aspire/Azure immediately; replace the local roadmap with cloud work;
+fold Kubernetes into the initial system; implement two CI/CD platforms at once. These obscure fundamentals
+or add premature complexity and were rejected.
+Consequences: Phase 3 Catalog remains the next implementation phase. Roadmap inclusion grants no authority
+to install packages/create projects/provision resources. Future deployment preserves four database owners,
+retains RabbitMQ when adding a Service Bus alternative, retains YARP when comparing API Management and
+reuses OpenTelemetry. Local and cloud configuration stay distinct. Select the first CI/CD platform in Phase 27;
+GitHub repository publication now does not make that choice or start that phase.
+Relationship to prior decisions: extends ADR-007/010's learning and handoff scope, without superseding the
+local architecture or ADR-001/003/004/009/013. No existing architecture decision is silently reversed.
+Validation for this change: document consistency, phase status/order, preserved local phases and unchanged
+non-documentation project files. No cloud implementation or Phase 3 business functionality is part of this update.

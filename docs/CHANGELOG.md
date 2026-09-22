@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-22 — Future learning roadmap (documentation only)
+- Extended the canonical roadmap with FUTURE / NOT STARTED Aspire/Azure Phases 19–28.
+- Separated local/core Phases 0–18 from cloud learning and a later Kubernetes/AKS track.
+- Preserved database ownership, RabbitMQ and YARP comparison paths, and existing OpenTelemetry concepts.
+- Recorded ADR-014; corrected stale scope/handoff wording while keeping Phases 0–2 complete and Phase 3 next.
+- No application/cloud implementation, Azure packages/resources or Aspire projects introduced.
+
 ## 2026-09-22 — Phase 2
 - Added PostgreSQL/RabbitMQ development Compose services with named volumes, health checks and localhost ports.
 - Provisioned four restricted database owner logins and verified every cross-service connection is denied.

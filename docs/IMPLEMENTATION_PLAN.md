@@ -1,8 +1,22 @@
 # Implementation plan
 
-Canonical roadmap. Last updated: 2026-09-22. Current authorization: Phase 2 only; Phases 0–1 complete.
+Canonical roadmap. Last updated: 2026-09-22. Phases 0–2 are complete; waiting to begin Phase 3.
+Current authorization: documentation-only roadmap extension. No implementation phase is authorized by this update.
 Status vocabulary: NOT STARTED, IN PROGRESS, COMPLETED, BLOCKED. Completed phases stay in this file.
 Each phase requires relevant build/tests plus the end-of-phase documentation updates in AGENTS.md.
+
+## Learning tracks and sequencing
+
+1. **LOCAL / CORE MICROSERVICES LEARNING — Phases 0–18:** the existing local roadmap remains unchanged.
+2. **DISTRIBUTED DEVELOPMENT / AZURE LEARNING — Phases 19–28:** future context only, all NOT STARTED.
+3. **SEPARATE ADVANCED TRACK — Kubernetes / AKS / related technologies:** future, separately scoped learning.
+
+The intended progression is local fundamentals -> explicit microservice architecture -> Docker ->
+observability -> .NET Aspire -> Azure managed services -> Infrastructure as Code -> CI/CD ->
+advanced Azure services -> Kubernetes/AKS later.
+Docker and observability develop incrementally in the existing phases; this summary does not renumber them.
+**Phase 3 — Catalog Microservice remains the next implementation phase.**
+Future phases extend the project; they neither replace its local architecture nor authorize early cloud work.
 
 ## Repository layout
 
@@ -74,7 +88,7 @@ Final Docker topology contains four APIs, Notification, Gateway and Web; Client 
 7. Implement small increments, build after meaningful steps and fix failures before proceeding.
 8. End every phase by updating roadmap, status, next steps, decisions, phase record and changelog; stop at authorized boundary.
 
-## Phases
+## LOCAL / CORE MICROSERVICES LEARNING — Phases 0–18
 
 ### Phase 00 — Architecture and repository planning
 Status: **COMPLETED**
@@ -265,6 +279,228 @@ Definition of Done: Another developer can run prerequisites, migrations, app and
 
 Dependencies: Phase 17 completed.
 Record: [phase-18-documentation.md](phases/phase-18-documentation.md)
+
+## DISTRIBUTED DEVELOPMENT / AZURE LEARNING — Phases 19–28
+
+All phases in this section are **FUTURE / NOT STARTED**. They extend the completed local curriculum;
+their presence in the roadmap is not authorization to install tools/packages, add projects or provision resources.
+Complete and understand Phases 0–18 before beginning Phase 19. Each later phase depends on the preceding
+phase and an explicit instruction to proceed. Keep the working local implementation available for comparison.
+Create a detailed phase record when that phase is authorized; the canonical planned scope is recorded here.
+
+### Phase 19 — .NET Aspire / Distributed Application Development
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: .NET Aspire, AppHost, Service Defaults, resource orchestration, service discovery,
+environment configuration, Aspire Dashboard, OpenTelemetry integration and the local distributed
+application development experience.
+
+Deliverables: an explicitly documented comparison between Docker Compose orchestration and an
+Aspire-based development workflow for the existing services. Introduce AppHost/Service Defaults only then.
+
+Definition of Done: explain how each resource, address, configuration value and telemetry path maps
+to the already understood local system; demonstrate both development workflows and document trade-offs.
+Aspire must not hide Docker, networking, configuration, service communication or microservice fundamentals.
+
+Dependencies: Phases 0–18 completed and understood, including explicit Docker Compose and local observability.
+
+### Phase 20 — Azure Foundation
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: Azure subscriptions, resource groups, regions, Azure CLI, Azure Developer CLI (azd),
+Azure RBAC fundamentals, environments, naming conventions, tagging and basic Azure cost awareness.
+
+Deliverables: a documented learning environment model, naming/tagging conventions, access boundaries,
+cost/budget expectations and cleanup procedure.
+
+Definition of Done: the learner can explain the basic resource model, scope of access, environment
+separation and cost implications, and use CLI/azd for the approved learning exercises.
+No application migration occurs until these fundamentals are understood.
+
+Dependencies: Phase 19 completed and explicit authorization for Azure learning work.
+
+### Phase 21 — Azure Container Registry and Azure Container Apps
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: Azure Container Registry (ACR), container image lifecycle, repositories, image tags,
+pushing/pulling images; Azure Container Apps, environments, revisions, replicas, ingress, environment
+variables, health probes, autoscaling fundamentals and service-to-service deployment concepts.
+
+Deliverables: build/push/pull and deploy the existing containerized MicroShop services, with documented
+ingress, internal communication, configuration and revision behavior. Preserve the local architecture.
+
+Definition of Done: trace a versioned image from build to registry to Container Apps revision;
+verify the deployment's ingress/probes/configuration and explain replicas/scaling and revision rollback.
+Document staged dependency availability: managed PostgreSQL and alternative messaging are later lessons,
+so successful container deployment alone does not claim a completed managed-cloud end-to-end workflow.
+Do not redesign the application specifically for Azure.
+
+Dependencies: Phase 20 completed; reuse the Phase 16 application containers.
+
+### Phase 22 — Azure Database for PostgreSQL
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: Azure Database for PostgreSQL Flexible Server, connectivity, connection security,
+database ownership, migrations, backups, basic networking and development versus cloud configuration.
+
+Deliverables: a cloud database configuration and migration/backup learning exercise preserving
+identity_db, catalog_db, inventory_db and ordering_db with separate service ownership.
+
+Definition of Done: each service can authenticate/migrate only its own database; cross-service
+access remains denied; verify secure connectivity and demonstrate/document backup and recovery behavior.
+Explain configuration differences from the local PostgreSQL container.
+Cloud deployment must not weaken logical database-per-service boundaries.
+
+Dependencies: Phase 21 completed; existing per-service migrations and ownership rules remain authoritative.
+
+### Phase 23 — Azure Service Bus
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: queues, topics, subscriptions, dead-letter queues, message locks/Peek-Lock,
+retries, delivery semantics, message settlement, competing consumers, publish/subscribe and failure handling.
+
+Deliverables: an alternative Azure Service Bus provider behind the messaging abstraction developed
+in the RabbitMQ lessons. Target conceptual design (not code that exists today):
+
+```text
+IEventBus
+  +-- RabbitMqEventBus
+  +-- AzureServiceBusEventBus
+```
+
+Definition of Done: run equivalent application integration-event scenarios with each provider and
+document semantic differences, duplicate delivery, retry/settlement and dead-letter behavior.
+Retain RabbitMQ as the original/local learning implementation. Keep application-level event concepts
+consistent where reasonable without pretending that the brokers have identical guarantees.
+Preserve Outbox/Inbox reasoning and verify failure recovery with the alternative provider.
+
+Dependencies: Phase 22 completed and the earlier RabbitMQ/Outbox/Inbox lessons understood.
+Do not remove RabbitMQ merely because Service Bus is introduced.
+
+### Phase 24 — Azure Key Vault and Managed Identity
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: Azure Key Vault, secrets, keys/certificates where relevant, Managed Identity,
+DefaultAzureCredential, Azure RBAC, passwordless access to supported Azure resources and
+local-development credentials versus cloud identities.
+
+Deliverables: move appropriate cloud secrets/configuration away from plain environment secrets;
+document supported identity-based access and least-privilege RBAC for the selected services.
+
+Definition of Done: demonstrate cloud identity/secret access and denied access outside intended roles;
+no secrets committed. Explain which settings remain non-secret configuration and which require protection.
+Local development configuration and Azure production-like configuration remain clearly distinguished.
+Select exact integrations/packages when this phase begins, not during roadmap maintenance.
+
+Dependencies: Phase 23 completed. Earlier cloud exercises must still keep secrets out of source;
+this phase deepens identity/secret-management learning rather than authorizing insecure earlier handling.
+
+### Phase 25 — Azure Observability
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: Azure Monitor, Application Insights, Log Analytics, OpenTelemetry, distributed traces,
+metrics, structured logs, correlation/trace IDs, dependency telemetry and KQL fundamentals.
+
+Deliverables: reuse the local OpenTelemetry instrumentation and connect the approved Azure telemetry
+pipeline; compare Aspire Dashboard for local development with Azure Monitor/Application Insights/
+Log Analytics for hosted environments.
+
+Definition of Done: follow an HTTP and asynchronous order flow using correlated telemetry, inspect
+dependencies/metrics/logs and demonstrate useful KQL queries; document telemetry configuration and cost.
+Do not create a separate, unrelated instrumentation approach.
+
+Dependencies: Phase 24 completed; reuse the Phase 15 and Phase 19 observability concepts.
+
+### Phase 26 — Infrastructure as Code
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: Bicep and Azure Developer CLI (azd), Infrastructure as Code, parameterized environments,
+repeatable provisioning, resource dependencies, outputs, environment-specific configuration and
+reproducible Azure environments.
+
+Deliverables: codify the learned Azure environment in Bicep and azd. Suggested future structure only:
+
+```text
+infra/
+  azure/
+    main.bicep
+    modules/
+    environments/
+```
+
+Definition of Done: provision an approved environment repeatably from version-controlled definitions
+and explicit parameters; document outputs, dependencies, environment differences and cleanup.
+Manual Portal exploration may support learning, but the final environment must not depend solely
+on manual Portal steps. Refine the exact file layout when this phase starts.
+
+Dependencies: Phase 25 completed. No infra/azure files are created by this roadmap update.
+
+### Phase 27 — CI/CD
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: choose one primary path, GitHub Actions OR Azure DevOps Pipelines; learn environment
+separation, deployment secrets/identity, artifacts, deployment configuration and rollback/revisions.
+
+Deliverables: automate this progression using the chosen platform:
+
+```text
+Source -> Restore -> Build -> Test -> Container Build -> Push to ACR
+       -> Deploy to Azure Container Apps -> Post-deployment verification
+```
+
+Definition of Done: a reproducible pipeline builds/tests and deploys identifiable artifacts to the
+intended environment, verifies deployment and demonstrates a documented rollback/revision procedure.
+Use an appropriate deployment identity and keep secrets out of source/logs.
+Record the platform choice in an ADR when this phase begins; no platform is selected now.
+A second platform may be explored later for comparison, not implemented simultaneously at first.
+
+Dependencies: Phase 26 completed; consume its repeatable infrastructure/environment configuration.
+
+### Phase 28 — Advanced Azure Application Platform
+Status: **NOT STARTED**
+Classification: FUTURE.
+
+Learning goals: Azure API Management, Microsoft Entra ID, Azure App Configuration, Feature Flags,
+private networking fundamentals, Private Endpoints, scaling, resilience, security hardening and cost awareness.
+
+Deliverables: bounded advanced learning exercises with documented responsibilities, trade-offs and
+effects on the existing service boundaries; explore only after prior Azure phases are understood.
+
+Definition of Done: document and verify the selected exercises, access/network boundaries, scaling/
+resilience behavior and cost implications. Compare YARP and Azure API Management responsibilities/use cases.
+Keep YARP initially; do not automatically replace it with API Management or silently redesign identity.
+Any later architectural change requires its own explicit decision and verification.
+
+Dependencies: Phases 19–27 completed and understood.
+
+## SEPARATE ADVANCED TRACK — Kubernetes / AKS / related technologies
+Status: **NOT STARTED**
+Classification: FUTURE, separate from the core MicroShop implementation and Phases 19–28.
+
+Only create/begin this advanced track after understanding:
+- .NET microservices fundamentals and PostgreSQL ownership.
+- EF Core + Dapper and synchronous service communication.
+- RabbitMQ, asynchronous integration events and Outbox/Inbox.
+- Docker and OpenTelemetry.
+- .NET Aspire, Azure Container Apps and Azure Service Bus.
+- Key Vault / Managed Identity, Bicep / azd and CI/CD.
+
+Topics: Kubernetes fundamentals, AKS, Pods, Deployments, Services, namespaces, ConfigMaps, Secrets,
+Ingress, persistent storage basics, readiness/liveness probes, requests/limits, autoscaling and Helm.
+Dapr and service mesh are potential later topics, not prerequisites or additions to the core architecture.
+
+Entry/exit expectations: begin only after the above prerequisites and a separate instruction;
+produce a separately scoped plan, exercises and comparison to Container Apps. Do not imply an automatic
+MicroShop migration to AKS. No AKS resources, manifests, Helm charts, Dapr or service mesh are introduced now.
 
 ## Risks and trade-offs
 - Four layers increase project count; retain them as a teaching aid, not an excuse for generic abstractions.

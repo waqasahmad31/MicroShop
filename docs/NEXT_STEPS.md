@@ -1,8 +1,10 @@
 # Next steps
 
 Phase 2 is complete. Stop; do not start Phase 3 until the user instructs continuation.
+The roadmap extension is documentation only; GitHub publication is repository management, not a new implementation phase.
+Aspire/Azure Phases 19–28 remain FUTURE / NOT STARTED and do not change the next step.
 
-## Next authorized milestone to request: Phase 3 — Catalog
+## Next implementation phase: Phase 3 — Catalog Microservice
 
 1. Read AGENTS.md and the prescribed handoff, then docs/phases/phase-03-catalog.md.
 2. Confirm infrastructure: docker compose up -d --wait --wait-timeout 120;

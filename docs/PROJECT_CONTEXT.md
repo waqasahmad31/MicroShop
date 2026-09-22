@@ -35,5 +35,21 @@ Business pages arrive in Phase 8, security in Phase 9, messaging in Phase 10, ob
 Earlier phases are local exercises with documented limitations, not secure or reliable deployment claims.
 
 ## Authorization and continuation
-Phases 0–1 are complete. The continuation request authorizes Phase 2 development infrastructure only.
+Phases 0–2 are complete. Current implementation state: waiting to begin Phase 3 — Catalog Microservice.
+Current work is documentation-only roadmap maintenance and initial GitHub publication, not application/cloud implementation.
 Do not start Phase 3 automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
+
+## Long-term learning roadmap (future context only)
+- LOCAL / CORE MICROSERVICES LEARNING: Phases 0–18 retain the explicit local architecture.
+- DISTRIBUTED DEVELOPMENT / AZURE LEARNING: Phases 19–28 are FUTURE / NOT STARTED:
+  Aspire; Azure foundation; ACR/Container Apps; Azure PostgreSQL; Service Bus; Key Vault/Managed Identity;
+  Azure observability; Bicep/azd; one CI/CD platform; advanced Azure application services.
+- SEPARATE ADVANCED TRACK: Kubernetes/AKS, with Dapr/service mesh only as potential later topics.
+  These remain excluded from the core MicroShop implementation.
+
+Learn Compose and underlying Docker/network/configuration concepts before Aspire. Reuse the existing
+service boundaries, four database owners and OpenTelemetry concepts in future cloud exercises.
+Retain RabbitMQ while comparing an alternative Service Bus provider; retain YARP while comparing API Management.
+Keep local configuration distinct from cloud production-like configuration, without committing secrets.
+Choose GitHub Actions OR Azure DevOps first in Phase 27; initial GitHub repository hosting does not select a CI/CD platform.
+The detailed goals, dependencies and Done criteria are in IMPLEMENTATION_PLAN.md; no future phase has begun.

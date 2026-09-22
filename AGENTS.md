@@ -12,7 +12,8 @@ Read before significant changes, in this order:
 
 ## Scope and non-negotiable rules
 - This is a learning project. Favor understandable code and explicit flows over clever abstractions.
-- Phases 0–1 are complete. Current authorization is Phase 2 infrastructure ONLY. Stop after Phase 2; do not start Phase 3 without a user instruction.
+- Phases 0–2 are complete. The current work is documentation-only roadmap maintenance and initial GitHub publication with phase-organized commits. No implementation phase is authorized; Phase 3 Catalog remains next.
+- Preserve the learning tracks: local/core Phases 0–18, FUTURE/NOT STARTED Aspire/Azure Phases 19–28, then a separately scoped Kubernetes/AKS track. Future roadmap entries are not permission to install packages, add Aspire projects or create cloud resources.
 - Database per service: identity_db, catalog_db, inventory_db, ordering_db. Never query another service's database; never create cross-service foreign keys.
 - EF Core primarily for commands/writes, Dapper primarily for queries/reads. Identity framework persistence is an appropriate exception.
 - Use .NET 10, ASP.NET Core, Blazor Web App with Interactive WebAssembly, MudBlazor, YARP, PostgreSQL and native RabbitMQ.Client.
