@@ -91,3 +91,23 @@ Reason: these are real Phase 1 failure modes.
 Alternatives: dummy assertion tests, premature domain tests.
 Consequences: future intentional boundary changes require an ADR and corresponding test updates.
 
+
+## ADR-013 — Concrete Phase 2 infrastructure and ownership
+Date: 2026-09-22.
+Context: implement the approved infrastructure phase without adding persistence code; host 5432 is already occupied.
+Decision: pin official postgres:17.11-bookworm and rabbitmq:4.2.9-management images; use the default
+Compose network, named volumes, localhost-only ports and unless-stopped restarts. Use a stable RabbitMQ
+hostname. PostgreSQL bootstraps four non-superuser service owner logins and databases, revokes PUBLIC
+access and grants each matching owner database/schema privileges. Keep microshop_admin bootstrap-only.
+Create ignored .env with distinct generated development passwords; preserve the 5432 repository default
+and override this machine to 5433. Prepare ConnectionStrings__Database via a script without new packages.
+Reason: explicit, testable database ownership, reproducible dependency startup and preserved existing local services.
+Alternatives considered: shared login/schema-only separation (weak boundary); stopping native PostgreSQL
+(disrupts other work); application containers/ORM setup now (outside Phase 2); moving major image tags
+(less repeatable); hardcoded container names (unneeded because Compose names are predictable).
+Consequences: bootstrap runs only on empty volumes, so .env changes do not rotate persisted accounts;
+service owners can migrate their own databases but not connect to another service database. An administrator
+still has cluster-wide access. down keeps data; down -v destroys this project's volumes. Health checks alone
+do not prove credentials/isolation, so a repeatable verifier makes actual TCP/SQL/HTTP/AMQP checks.
+Validation: four own logins, four wrong-password denials, 12 cross-service denials; persistence and clean
+initialization passed; both containers healthy. This refines ADR-001/009, without changing service architecture.

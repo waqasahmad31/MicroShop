@@ -176,6 +176,16 @@ later Compose initialization must be single-owner and documented.
 
 ## Docker and observability
 Phase 2: PostgreSQL (5432), RabbitMQ (5672, management 15672); persistent named volumes and health checks.
+Implemented Phase 2: postgres:17.11-bookworm and rabbitmq:4.2.9-management on the default Compose network.
+Only localhost ports are published. The current machine uses PostgreSQL host 5433 via ignored .env
+because native PostgreSQL occupies 5432; the container and repository default remain 5432.
+Service owner roles are identity_app/catalog_app/inventory_app/ordering_app. PUBLIC database/schema
+access is revoked and only the matching owner is granted access; the bootstrap microshop_admin is
+separate from application credentials. All 12 cross-service connection attempts are verified denied.
+Volumes are microshop_postgres_data and microshop_rabbitmq_data; RabbitMQ keeps a stable hostname.
+Bootstrap scripts create no application tables. See [Docker runbook](docker.md) for actual lifecycle tests.
+ConnectionStrings__Database is the future per-service setting, prepared by Set-ServiceEnvironment.ps1;
+the current skeleton does not consume it yet. No dependency packages or application code were changed.
 Phase 16: add seven application hosts (four APIs, Notification, Gateway, Web); internal HTTP port 8080,
 service DNS and environment configuration. Client is a build artifact hosted by Web, not another container.
 Use internal service URLs inside containers and host-accessible URLs in browser configuration.
@@ -191,4 +201,3 @@ A browser-to-gateway parent span needs explicit browser-side work; do not claim 
 - [Blazor render modes](https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-10.0)
 - [YARP getting started](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/getting-started?view=aspnetcore-10.0)
 - [MudBlazor installation](https://mudblazor.com/getting-started/installation)
-

@@ -12,7 +12,7 @@ Read before significant changes, in this order:
 
 ## Scope and non-negotiable rules
 - This is a learning project. Favor understandable code and explicit flows over clever abstractions.
-- Current authorization is Phases 0–1 only. Stop after the skeleton; later phases require an instruction to continue.
+- Phases 0–1 are complete. Current authorization is Phase 2 infrastructure ONLY. Stop after Phase 2; do not start Phase 3 without a user instruction.
 - Database per service: identity_db, catalog_db, inventory_db, ordering_db. Never query another service's database; never create cross-service foreign keys.
 - EF Core primarily for commands/writes, Dapper primarily for queries/reads. Identity framework persistence is an appropriate exception.
 - Use .NET 10, ASP.NET Core, Blazor Web App with Interactive WebAssembly, MudBlazor, YARP, PostgreSQL and native RabbitMQ.Client.
@@ -35,4 +35,3 @@ Record exact commands, actual results, environmental blockers, migrations, API c
 Do not mark a phase completed while its documentation or required verification is incomplete.
 Keep completed phases in the roadmap. Never silently reverse an ADR; supersede it with a new ADR.
 Repository documentation is the persistent source of truth. Verify it against files before changes; do not depend on chat history.
-

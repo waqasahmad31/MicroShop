@@ -1,7 +1,8 @@
 # MicroShop
 
 A step-by-step .NET 10 microservices learning project. This repository currently contains the
-Phase 0 architecture plan and Phase 1 solution skeleton. Business features arrive in later phases.
+Phase 0 architecture plan, Phase 1 solution skeleton and verified Phase 2 development infrastructure.
+Business features arrive in later phases.
 
 Start with [the implementation plan](docs/IMPLEMENTATION_PLAN.md),
 [current status](docs/CURRENT_STATUS.md) and [next steps](docs/NEXT_STEPS.md).
@@ -79,6 +80,28 @@ In Development, each of the four APIs serves `/openapi/v1.json`.
 Swagger UI is not installed yet; it is added alongside API features. There is no `/swagger` page now.
 Gateway `/api/*` routes start in Phase 7. Health checks start in Phase 15; `/` is not a readiness check.
 
+## Development infrastructure
+
+Only PostgreSQL and RabbitMQ run in Docker; application hosts still run through the CLI/IDE.
+The [Docker runbook](docs/docker.md) covers credentials, database isolation, lifecycle and reset.
+
+```powershell
+# First setup only; refuses to overwrite an existing .env:
+./scripts/New-DevelopmentEnvironment.ps1
+docker compose config --quiet
+docker compose up -d --wait --wait-timeout 120
+./scripts/Test-Infrastructure.ps1
+```
+
+On this machine .env already exists, with PostgreSQL host port **5433** because native PostgreSQL uses 5432.
+Repository defaults remain PostgreSQL 5432, RabbitMQ 5672 and management 15672; all bind only to localhost.
+Open [RabbitMQ Management](http://localhost:15672) and use credentials from ignored .env.
+Four databases each have their own restricted login; all 12 cross-service connections were verified denied.
+Both named volumes survived container recreation; a fresh-volume reset was also verified.
+
+Use `docker compose down` to stop while retaining data. `docker compose down -v` deliberately deletes it.
+No persistence packages, tables, migrations or event code have been added.
+
 ## Projects and references
 
 There are 23 source projects and one xUnit architecture test project.
@@ -111,7 +134,7 @@ The [decision log](docs/DECISIONS.md) records trade-offs; [phase records](docs/p
 
 Initial inspection found a Windows workload-metadata exception from `dotnet --info`, while version/templates work.
 Actual restore/build/test results are recorded in [current status](docs/CURRENT_STATUS.md).
-Docker infrastructure is not implemented in this phase.
+Docker's Linux engine is now running and both Phase 2 containers are healthy.
+Expected negative permission checks may appear as PostgreSQL connection errors in logs.
 
-Phase 1 is complete. Phase 2 infrastructure is next and requires an instruction to continue.
-
+Phase 2 is complete. Phase 3 Catalog is next and requires an instruction to continue.

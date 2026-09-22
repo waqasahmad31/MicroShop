@@ -35,6 +35,5 @@ Business pages arrive in Phase 8, security in Phase 9, messaging in Phase 10, ob
 Earlier phases are local exercises with documented limitations, not secure or reliable deployment claims.
 
 ## Authorization and continuation
-The initial request authorizes Phase 0 planning and Phase 1 skeleton only.
-Do not start Phase 2 automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
-
+Phases 0–1 are complete. The continuation request authorizes Phase 2 development infrastructure only.
+Do not start Phase 3 automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.

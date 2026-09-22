@@ -1,6 +1,6 @@
 # Implementation plan
 
-Canonical roadmap. Last updated: 2026-09-22. Current authorization: Phases 0–1 only.
+Canonical roadmap. Last updated: 2026-09-22. Current authorization: Phase 2 only; Phases 0–1 complete.
 Status vocabulary: NOT STARTED, IN PROGRESS, COMPLETED, BLOCKED. Completed phases stay in this file.
 Each phase requires relevant build/tests plus the end-of-phase documentation updates in AGENTS.md.
 
@@ -97,7 +97,7 @@ Dependencies: Phase 00 completed.
 Record: [phase-01-skeleton.md](phases/phase-01-skeleton.md)
 
 ### Phase 02 — Development infrastructure
-Status: **NOT STARTED**
+Status: **COMPLETED**
 
 Deliverables: PostgreSQL and RabbitMQ Compose services; environment configuration; four database roles/databases; local connection setup.
 
@@ -274,7 +274,8 @@ Record: [phase-18-documentation.md](phases/phase-18-documentation.md)
 - Early APIs/UI are unauthenticated local exercises until Phase 9. JWTs/private keys must never enter logs/public assets.
 - WASM initial load is larger, and disabling prerendering delays initial content; it simplifies browser-only state.
 - Separate processes and ports increase local startup effort; Compose simplifies that in the planned stages.
-- Initial environment inspection recorded a workload-metadata diagnostic error and an unavailable Docker engine; verify actual build and infrastructure in their phases.
+- Phase 1 recorded a failing dotnet --info workload diagnostic; actual .NET verification passes.
+  Docker is running in Phase 2. Native PostgreSQL owns host 5432; local .env uses 5433.
 - Latest package versions do not prove compatibility; actual restore/build/test is the acceptance evidence.
 - Notification logs are best-effort; no persistent/exactly-once notification guarantee is claimed.
 
@@ -289,4 +290,3 @@ Add topic guides when their implementation can be described accurately:
 - Phase 13: outbox-pattern.md.
 - Phases 2/16: docker.md (infrastructure first, full system later).
 Phase 18 audits all guides rather than generating them only at the end.
-
