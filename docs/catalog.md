@@ -25,12 +25,13 @@ Migrations and seeding are explicit commands; starting the HTTP host does neithe
 Stop the host with Ctrl+C. Run tests in another terminal:
 
 ```powershell
-./scripts/Test-Catalog.ps1
+./scripts/Test-All.ps1
 ./scripts/Test-Skeleton.ps1
 ```
 
-The first runs all 30 tests (9 unit/application, 17 PostgreSQL integration, 4 architecture).
-It prepares the test connection privately and restores prior environment values afterward.
+The first runs all current solution tests, including the original 30 Catalog/architecture checks
+and 41 Inventory checks added in Phase 4. Test-Catalog.ps1 remains a compatibility wrapper.
+It prepares separate service test connections privately and restores prior environment values afterward.
 Integration tests create/migrate/seed a random `catalog_test_<guid>` schema under catalog_app,
 exclude public from SearchPath and drop only that generated schema on teardown. They require a
 reachable local PostgreSQL; missing configuration fails clearly rather than silently skipping.
@@ -91,7 +92,7 @@ fails atomically: rename/remove that development conflict deliberately, then rer
 
 Category IDs: Computers `11111111-1111-1111-1111-111111111111`,
 Accessories `11111111-1111-1111-1111-111111111112`.
-Future Inventory seeds can repeat product IDs in their own data without querying Catalog's database.
+Phase 4 Inventory seeds repeat product IDs in their own data without querying Catalog's database.
 
 Migration `20260922174057_InitialCatalog` creates `categories`, `products`, their indexes/constraints and
 EF's history table only. To review SQL or check model drift after setting the service environment:

@@ -34,8 +34,8 @@ foreach ($hostToCheck in $hostsToCheck) {
     $stderr = Join-Path $logDirectory "$($hostToCheck.Name).stderr.log"
     $previousDatabase = $env:ConnectionStrings__Database
     try {
-        if ($hostToCheck.Name -eq 'Catalog') {
-            & "$PSScriptRoot/Set-ServiceEnvironment.ps1" -Service Catalog
+        if ($hostToCheck.Name -in @('Catalog', 'Inventory')) {
+            & "$PSScriptRoot/Set-ServiceEnvironment.ps1" -Service $hostToCheck.Name
         }
         $process = Start-Process -FilePath 'dotnet' -ArgumentList @(
             'run', '--project', $hostToCheck.Project, '--no-build', '--no-restore', '--launch-profile', 'http'
@@ -74,7 +74,7 @@ foreach ($hostToCheck in $hostsToCheck) {
         }
         else {
             $identity = $response.Content | ConvertFrom-Json
-            $expectedPhase = if ($hostToCheck.Name -eq 'Catalog') { 'Catalog' } else { 'Solution skeleton' }
+            $expectedPhase = if ($hostToCheck.Name -in @('Catalog', 'Inventory')) { $hostToCheck.Name } else { 'Solution skeleton' }
             if ($identity.service -ne $hostToCheck.Name -or $identity.phase -ne $expectedPhase) {
                 throw "Unexpected identity response on port $port."
             }
@@ -100,6 +100,19 @@ foreach ($hostToCheck in $hostsToCheck) {
             $swagger = Invoke-WebRequest -Uri "$url/swagger/index.html" -TimeoutSec 5
             if ($swagger.Content -notmatch 'swagger-ui') { throw 'Catalog Swagger UI is unavailable.' }
         }
+        if ($hostToCheck.Name -eq 'Inventory') {
+            $items = Invoke-RestMethod -Uri "$url/api/inventory/items?pageSize=2" -TimeoutSec 5
+            if ($items.pageSize -ne 2 -or $null -eq $items.totalCount) {
+                throw 'Inventory did not return a paginated database result.'
+            }
+            foreach ($item in $items.items) {
+                if ($item.available -ne ($item.onHand - $item.reserved) -or $item.available -lt 0) {
+                    throw 'Inventory returned inconsistent quantities.'
+                }
+            }
+            $swagger = Invoke-WebRequest -Uri "$url/swagger/index.html" -TimeoutSec 5
+            if ($swagger.Content -notmatch 'swagger-ui') { throw 'Inventory Swagger UI is unavailable.' }
+        }
 
         Write-Output "PASS $($hostToCheck.Name) ($url)"
     }
@@ -111,4 +124,4 @@ foreach ($hostToCheck in $hostsToCheck) {
     }
 }
 
-Write-Output 'Seven hosts passed, including a Catalog database read and Swagger delivery. Browser execution is not covered.'
+Write-Output 'Seven hosts passed, including Catalog/Inventory database reads and Swagger delivery. Browser execution is not covered.'

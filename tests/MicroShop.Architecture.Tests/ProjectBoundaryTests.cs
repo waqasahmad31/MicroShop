@@ -101,7 +101,9 @@ public sealed class ProjectBoundaryTests
             ["MicroShop.Observability"] = [],
             ["MicroShop.Architecture.Tests"] = [],
             ["Catalog.Unit.Tests"] = ["Catalog.Application", "Catalog.Domain"],
-            ["Catalog.Integration.Tests"] = ["Catalog.Api", "Catalog.Application", "Catalog.Infrastructure"]
+            ["Catalog.Integration.Tests"] = ["Catalog.Api", "Catalog.Application", "Catalog.Infrastructure"],
+            ["Inventory.Unit.Tests"] = ["Inventory.Application", "Inventory.Domain"],
+            ["Inventory.Integration.Tests"] = ["Inventory.Api", "Inventory.Application", "Inventory.Infrastructure"]
         };
 
         foreach (var service in Services)

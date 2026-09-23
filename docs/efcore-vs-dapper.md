@@ -32,3 +32,18 @@ PUT attaches a validated replacement with the supplied ID; zero updated rows bec
 Updates use last-write-wins rather than optimistic tokens. Read-before-write validation alone cannot
 guarantee uniqueness or referential integrity; database constraints provide the final enforcement.
 No distributed transaction, generic repository, shared domain model or event bus is introduced.
+
+## Inventory adjustments
+
+InventoryService validates input and calls IInventoryWriter.AdjustAsync. EfInventoryWriter begins a
+Read Committed transaction, loads a tracked InventoryItem through parameterized EF SELECT FOR UPDATE,
+invokes its AdjustOnHand rule, saves and commits. The row lock serializes concurrent changes to one item.
+The Domain method rejects consuming reserved stock, underflow and overflow before changing the entity.
+This command-side EF read belongs to the atomic write operation. Using an earlier Dapper read followed
+by an unconditional update would risk losing another request's adjustment.
+
+IInventoryReader/DapperInventoryReader handles GET projections and paginated lists from inventory_db.
+It derives Available in SQL and passes CancellationToken via CommandDefinition. No Catalog joins exist.
+Inventory's command interface exposes only create and atomic adjustment operations; Application/Domain
+still have no framework packages. Compare Catalog's last-write-wins descriptive edits with Inventory's
+serialized stock deltas in [the Inventory guide](inventory.md) and ADR-016.

@@ -1,6 +1,6 @@
 # Architecture decisions
 
-All entries dated 2026-09-22. Supersede decisions with a new ADR; preserve history.
+Dates are recorded per entry; ADR-001–015 were recorded on 2026-09-22. Supersede decisions with a new ADR; preserve history.
 
 ## ADR-001 — Database per service
 Context: one development PostgreSQL server must not become a shared data model.
@@ -159,3 +159,27 @@ Tests require local PostgreSQL and schema-creation rights in catalog_db; an inte
 disposable schema to inspect/clean. Authentication remains Phase 9. Future stock ownership stays with Inventory.
 Validation: 30 tests passed, including concurrent duplicate rejection, CRUD, input errors, literal search,
 isolated migration and repeatable seed; all seven HTTP hosts passed. Migration touched Catalog only.
+
+## ADR-016 — Inventory quantities and concurrent adjustments
+Date: 2026-09-23.
+Context: stock changes must not lose concurrent updates or reduce on-hand below reserved quantities.
+Decision: Inventory owns one InventoryItem per external ProductId in inventory_db, with integer OnHand,
+Reserved and derived Available. Enforce 0 <= Reserved <= OnHand <= Int32.MaxValue in Domain and database.
+Create starts Reserved at zero; signed nonzero deltas add/remove on-hand. A negative delta is valid only
+when sufficient available stock remains. Empty IDs, missing quantities and zero deltas are validation errors.
+An adjustment starts a Read Committed transaction, loads the row through parameterized EF SELECT FOR UPDATE,
+invokes the Domain method, saves with EF and commits before returning. Dapper handles read projections.
+Stock conflicts return 409; invalid input 400; missing item 404. Duplicate ProductId is protected by the PK.
+No Catalog lookup/FK/project reference: external ID validity is a future service communication responsibility.
+Deterministic seed IDs match Catalog by documented convention; local stock starts 10/25/40/15/20.
+Reason: serialize writers of the same item across API instances while preserving stock rules in Domain.
+Alternatives: last-write-wins (loses deltas), process-local locks (not cross-instance), optimistic version
+retries (more retry machinery), atomic SQL-only arithmetic (moves the central rule out of Domain).
+Consequences: transactions must stay short; cancellation and command timeout bound blocked queries.
+GET is a point-in-time observation, not a reservation. Reserved is represented/enforced but no reservation,
+release, order/event workflow, ledger or idempotency key is introduced. Do not blindly retry an adjustment
+after an uncertain response; it may already have committed. Phase 11 will add order-level reservations.
+Tests use isolated schemas with service-specific connections. Validation: 71 total tests passed, including
+32 increments across two hosts, competing deductions with zero/nonzero reserved stock and an observed
+row-lock wait followed by validation against newly committed state. No lost changes, underflow or reserved
+stock consumption. Full build and seven-host smoke checks passed; only Inventory received a new migration.

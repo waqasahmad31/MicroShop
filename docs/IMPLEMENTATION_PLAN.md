@@ -1,7 +1,7 @@
 # Implementation plan
 
-Canonical roadmap. Last updated: 2026-09-22. Phases 0–3 are complete; waiting to begin Phase 4.
-Completed authorized work: Phase 3 Catalog. Stop before Phase 4 until instructed to continue.
+Canonical roadmap. Last updated: 2026-09-23. Phases 0–4 are complete; waiting to begin Phase 5.
+Completed authorized work: Phase 4 Inventory. Stop before Phase 5 until instructed to continue.
 Status vocabulary: NOT STARTED, IN PROGRESS, COMPLETED, BLOCKED. Completed phases stay in this file.
 Each phase requires relevant build/tests plus the end-of-phase documentation updates in AGENTS.md.
 
@@ -15,7 +15,7 @@ The intended progression is local fundamentals -> explicit microservice architec
 observability -> .NET Aspire -> Azure managed services -> Infrastructure as Code -> CI/CD ->
 advanced Azure services -> Kubernetes/AKS later.
 Docker and observability develop incrementally in the existing phases; this summary does not renumber them.
-**Phase 4 — Inventory Microservice is the next implementation phase.**
+**Phase 5 — Ordering Microservice is the next implementation phase.**
 Future phases extend the project; they neither replace its local architecture nor authorize early cloud work.
 
 ## Repository layout
@@ -36,6 +36,7 @@ MicroShop/
       Notification/Notification.Service
     BuildingBlocks/Contracts, Messaging, Observability
   tests/MicroShop.Architecture.Tests, Catalog.Unit.Tests, Catalog.Integration.Tests
+  tests/Inventory.Unit.Tests, Inventory.Integration.Tests
   .config/dotnet-tools.json (dotnet-ef 10.0.12)
   docs/ (context, architecture, roadmap, status, next steps, ADRs, changelog, phases)
   docker-compose.yml / .env.example (Phase 2)
@@ -74,6 +75,8 @@ Catalog.Infrastructure uses EF Core/Relational/Design 10.0.12 (Design private), 
 and Dapper 2.1.86. Catalog.Api adds SwaggerUI 10.2.3. Catalog.Integration.Tests uses Mvc.Testing 10.0.12;
 both Catalog test projects use the existing xUnit/Test SDK versions. Domain/Application remain package-free.
 Relational is pinned explicitly to avoid a transitive 10.0.4/10.0.12 assembly conflict.
+Phase 4 Inventory uses the same versions for its Infrastructure, Swagger UI and two feature test projects.
+Its Domain/Application remain package-free; no shared persistence project or cross-service reference was added.
 
 ## Ports, databases and infrastructure
 Web 5100; Gateway 5200; Identity 5210; Catalog 5220; Inventory 5230; Ordering 5240; Notification 5250.
@@ -136,7 +139,7 @@ Dependencies: Phase 02 completed.
 Record: [phase-03-catalog.md](phases/phase-03-catalog.md)
 
 ### Phase 04 — Inventory microservice
-Status: **NOT STARTED**
+Status: **COMPLETED**
 
 Deliverables: InventoryItem, on-hand/reserved/available invariants, stock adjustments, EF writes, Dapper reads, migrations and deterministic seeds.
 
@@ -524,6 +527,7 @@ MicroShop migration to AKS. No AKS resources, manifests, Helm charts, Dapr or se
 Existing: ARCHITECTURE plus context, plan, status, next steps, ADRs, changelog and phase records.
 Add topic guides when their implementation can be described accurately:
 - Phase 3: database-ownership.md, efcore-vs-dapper.md.
+- Phase 4: inventory.md, plus updates to database ownership, EF/Dapper and test setup guides.
 - Phase 6: request-flow.md, synchronous-communication.md.
 - Phase 9: authentication-flow.md.
 - Phase 10: rabbitmq.md.

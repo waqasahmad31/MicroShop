@@ -23,7 +23,7 @@ Catalog owns price. Ordering stores product name and price snapshots. Inventory 
 Notification initially logs confirmed/rejected order events without a database or email provider.
 Development seed identities: admin@microshop.local and customer@microshop.local.
 Seed catalog: Laptop, Keyboard, Mouse, Monitor, Headphones; categories Computers and Accessories.
-Future seed IDs must be deterministic across Catalog and Inventory without database joins.
+Seed IDs are deterministic across Catalog and Inventory without database joins.
 
 ## Constraints and philosophy
 One database and database role per owning service. HTTP/events cross boundaries; SQL and domain entities do not.
@@ -35,10 +35,11 @@ Business pages arrive in Phase 8, security in Phase 9, messaging in Phase 10, ob
 Earlier phases are local exercises with documented limitations, not secure or reliable deployment claims.
 
 ## Authorization and continuation
-Phases 0–3 are complete. Catalog implements product/category CRUD with EF writes and Dapper reads,
-real PostgreSQL tests, explicit migration and development seed commands. The public repository is
+Phases 0–4 are complete. Catalog implements product/category CRUD; Inventory implements stock items,
+safe concurrent adjustments and reads. Both use EF writes, Dapper reads, real PostgreSQL tests and
+explicit migrations/development seeds. Inventory reservation workflows remain Phase 11. The public repository is
 https://github.com/waqasahmad31/MicroShop, with detailed phase-wise commits.
-Do not start Phase 4 Inventory automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
+Do not start Phase 5 Ordering automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
 
 ## Long-term learning roadmap (future context only)
 - LOCAL / CORE MICROSERVICES LEARNING: Phases 0–18 retain the explicit local architecture.

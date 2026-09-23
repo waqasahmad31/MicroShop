@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-23 — Phase 4
+- Implemented Inventory item creation, stock deltas and paginated/detail reads in its existing four layers.
+- Enforced on-hand/reserved/available rules and overflow bounds; serialized adjustments with EF transactions/row locks.
+- Added Inventory-only migration, deterministic stock seeds, ProblemDetails and Development Swagger/OpenAPI.
+- Added 14 unit/application and 27 real PostgreSQL integration tests; all 71 solution tests pass.
+- Verified concurrent updates across hosts, reserved-stock protection, lock waits, database constraints and seed preservation.
+- Added service-specific test environment setup; preserved Catalog's test entry point and extended seven-host smoke checks.
+- Verified migration ownership, seed repeatability, clean build/model checks and unchanged Catalog data without volume resets.
+- Added Inventory learning guide and ADR-016; updated persistent handoff and stopped before Phase 5 Ordering.
+
 ## 2026-09-22 — Phase 3
 - Implemented Catalog product/category CRUD, domain validation and application use cases.
 - Added EF Core writes/migration, parameterized Dapper details/search/pagination and database constraints.
