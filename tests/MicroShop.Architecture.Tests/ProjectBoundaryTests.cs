@@ -103,7 +103,9 @@ public sealed class ProjectBoundaryTests
             ["Catalog.Unit.Tests"] = ["Catalog.Application", "Catalog.Domain"],
             ["Catalog.Integration.Tests"] = ["Catalog.Api", "Catalog.Application", "Catalog.Infrastructure"],
             ["Inventory.Unit.Tests"] = ["Inventory.Application", "Inventory.Domain"],
-            ["Inventory.Integration.Tests"] = ["Inventory.Api", "Inventory.Application", "Inventory.Infrastructure"]
+            ["Inventory.Integration.Tests"] = ["Inventory.Api", "Inventory.Application", "Inventory.Infrastructure"],
+            ["Ordering.Unit.Tests"] = ["Ordering.Application", "Ordering.Domain"],
+            ["Ordering.Integration.Tests"] = ["Ordering.Api", "Ordering.Application", "Ordering.Infrastructure"]
         };
 
         foreach (var service in Services)

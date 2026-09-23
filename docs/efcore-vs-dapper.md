@@ -47,3 +47,16 @@ It derives Available in SQL and passes CancellationToken via CommandDefinition. 
 Inventory's command interface exposes only create and atomic adjustment operations; Application/Domain
 still have no framework packages. Compare Catalog's last-write-wins descriptive edits with Inventory's
 serialized stock deltas in [the Inventory guide](inventory.md) and ADR-016.
+
+## Ordering aggregates and historical reads
+
+OrderingService creates a Pending Order from trusted in-process priced lines. EF SaveChanges saves the
+header and immutable items in one transaction: a rejected line rolls back the entire aggregate.
+Items expose a read-only collection backed by a private list that EF can populate. Domain and SQL derive
+totals from quantity times snapshotted price, so there is no independently editable total column.
+
+Status commands lock the order row and refresh tracked state before applying Domain transitions. This
+prevents competing outcomes or stale tracked entities from overwriting terminal state. Dapper supplies
+details and customer-filtered history with local snapshot data only. It never joins live product tables.
+The HTTP surface has GETs only; Phase 6 must obtain authoritative Catalog prices before exposing checkout.
+See [Ordering guide](ordering.md) and ADR-017 for contracts, state rules and limits.

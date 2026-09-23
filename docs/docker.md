@@ -233,8 +233,8 @@ Use reset only when MicroShop's data is disposable. Do not use Docker system pru
 
 ## Sources
 
-Phase 4 note: Catalog and Inventory own persistent application tables. After an intentional full reset,
-follow [the Catalog guide](catalog.md) and [Inventory guide](inventory.md) to reapply each migration/seed.
+Phase 5 note: Catalog, Inventory and Ordering own persistent application tables. After an intentional full reset,
+follow [Catalog](catalog.md), [Inventory](inventory.md) and [Ordering](ordering.md) to reapply each migration/seed.
 Ordinary startup/tests do not reset volumes; integration tests use disposable schemas in each owned database.
 
 - [Official PostgreSQL image documentation](https://github.com/docker-library/docs/blob/master/postgres/README.md):

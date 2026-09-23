@@ -12,7 +12,7 @@ Read before significant changes, in this order:
 
 ## Scope and non-negotiable rules
 - This is a learning project. Favor understandable code and explicit flows over clever abstractions.
-- Phases 0–4 are complete. Stop before Phase 5 Ordering until the user instructs continuation. Continue phase-wise project-focused commits without attribution trailers.
+- Phases 0–5 are complete. Stop before Phase 6 synchronous service communication until the user instructs continuation. Continue phase-wise project-focused commits without attribution trailers.
 - Preserve the learning tracks: local/core Phases 0–18, FUTURE/NOT STARTED Aspire/Azure Phases 19–28, then a separately scoped Kubernetes/AKS track. Future roadmap entries are not permission to install packages, add Aspire projects or create cloud resources.
 - Database per service: identity_db, catalog_db, inventory_db, ordering_db. Never query another service's database; never create cross-service foreign keys.
 - EF Core primarily for commands/writes, Dapper primarily for queries/reads. Identity framework persistence is an appropriate exception.

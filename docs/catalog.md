@@ -29,8 +29,8 @@ Stop the host with Ctrl+C. Run tests in another terminal:
 ./scripts/Test-Skeleton.ps1
 ```
 
-The first runs all current solution tests, including the original 30 Catalog/architecture checks
-and 41 Inventory checks added in Phase 4. Test-Catalog.ps1 remains a compatibility wrapper.
+The first runs all current solution tests, including 30 Catalog/architecture checks, 41 Inventory checks
+and 37 Ordering checks (108 total). Test-Catalog.ps1 remains a compatibility wrapper.
 It prepares separate service test connections privately and restores prior environment values afterward.
 Integration tests create/migrate/seed a random `catalog_test_<guid>` schema under catalog_app,
 exclude public from SearchPath and drop only that generated schema on teardown. They require a

@@ -115,12 +115,13 @@ or database is contacted. Ordinary migrations, seeding and tests do not reset Do
 ./scripts/Test-Skeleton.ps1
 ```
 
-Test-All supplies separate CATALOG_TEST_CONNECTION_STRING and INVENTORY_TEST_CONNECTION_STRING privately,
+Test-All supplies separate CATALOG_TEST_CONNECTION_STRING, INVENTORY_TEST_CONNECTION_STRING and
+ORDERING_TEST_CONNECTION_STRING privately,
 runs the solution and restores previous environment settings. Test-Catalog remains a compatibility wrapper
 for the same whole-solution behavior. Without the script, set both explicit test connections before dotnet test.
 
-There are 71 tests: 4 architecture, 9 Catalog unit/application, 17 Catalog integration, 14 Inventory
-unit/application and 27 Inventory integration. Real PostgreSQL fixtures create a random owned schema
+There are 108 tests: the original 71 (4 architecture, 9/17 Catalog unit/integration, 14/27 Inventory
+unit/integration) plus 21/16 Ordering unit/integration. Real PostgreSQL fixtures create a random owned schema
 with independent migration history, exclude public from SearchPath and drop only that generated schema.
 The fixtures fail clearly if configuration is missing. An interrupted run can leave a disposable schema;
 inspect its ownership before cleanup. Local application seed rows are not test data.
@@ -131,5 +132,5 @@ increments; competing deductions test both zero and nonzero reserved stock. A de
 observes the blocked database writer, commits a competing deduction and verifies the waiting request
 rejects the now-insufficient quantity. Swagger/OpenAPI are also verified.
 
-The smoke script requires both service migrations and a built solution; it starts/stops all seven hosts,
-checks Catalog/Inventory database reads and Swagger HTML. It does not automate a browser.
+The smoke script requires Catalog/Inventory/Ordering migrations and a built solution; it starts/stops
+seven hosts, checks database reads and Swagger HTML. It does not automate a browser.

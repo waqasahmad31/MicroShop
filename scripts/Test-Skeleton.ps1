@@ -34,7 +34,7 @@ foreach ($hostToCheck in $hostsToCheck) {
     $stderr = Join-Path $logDirectory "$($hostToCheck.Name).stderr.log"
     $previousDatabase = $env:ConnectionStrings__Database
     try {
-        if ($hostToCheck.Name -in @('Catalog', 'Inventory')) {
+        if ($hostToCheck.Name -in @('Catalog', 'Inventory', 'Ordering')) {
             & "$PSScriptRoot/Set-ServiceEnvironment.ps1" -Service $hostToCheck.Name
         }
         $process = Start-Process -FilePath 'dotnet' -ArgumentList @(
@@ -74,7 +74,7 @@ foreach ($hostToCheck in $hostsToCheck) {
         }
         else {
             $identity = $response.Content | ConvertFrom-Json
-            $expectedPhase = if ($hostToCheck.Name -in @('Catalog', 'Inventory')) { $hostToCheck.Name } else { 'Solution skeleton' }
+            $expectedPhase = if ($hostToCheck.Name -in @('Catalog', 'Inventory', 'Ordering')) { $hostToCheck.Name } else { 'Solution skeleton' }
             if ($identity.service -ne $hostToCheck.Name -or $identity.phase -ne $expectedPhase) {
                 throw "Unexpected identity response on port $port."
             }
@@ -114,6 +114,15 @@ foreach ($hostToCheck in $hostsToCheck) {
             if ($swagger.Content -notmatch 'swagger-ui') { throw 'Inventory Swagger UI is unavailable.' }
         }
 
+        if ($hostToCheck.Name -eq 'Ordering') {
+            $orders = Invoke-RestMethod -Uri "$url/api/orders?customerId=33333333-3333-3333-3333-333333333331&pageSize=2" -TimeoutSec 5
+            if ($orders.pageSize -ne 2 -or $null -eq $orders.totalCount) { throw 'Ordering history is unavailable.' }
+            $swagger = Invoke-WebRequest -Uri "$url/swagger/index.html" -TimeoutSec 5
+            if ($swagger.Content -notmatch 'swagger-ui') { throw 'Ordering Swagger UI is unavailable.' }
+            $create = Invoke-WebRequest -Uri "$url/api/orders" -Method Post -ContentType 'application/json' -Body '{}' -SkipHttpErrorCheck -TimeoutSec 5
+            if ($create.StatusCode -ne 405) { throw 'Ordering exposed checkout before Phase 6.' }
+        }
+
         Write-Output "PASS $($hostToCheck.Name) ($url)"
     }
     finally {
@@ -124,4 +133,4 @@ foreach ($hostToCheck in $hostsToCheck) {
     }
 }
 
-Write-Output 'Seven hosts passed, including Catalog/Inventory database reads and Swagger delivery. Browser execution is not covered.'
+Write-Output 'Seven hosts passed, including Catalog/Inventory/Ordering database reads and Swagger delivery. Browser execution is not covered.'

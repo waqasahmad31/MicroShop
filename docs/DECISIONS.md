@@ -183,3 +183,30 @@ Tests use isolated schemas with service-specific connections. Validation: 71 tot
 32 increments across two hosts, competing deductions with zero/nonzero reserved stock and an observed
 row-lock wait followed by validation against newly committed state. No lost changes, underflow or reserved
 stock consumption. Full build and seven-host smoke checks passed; only Inventory received a new migration.
+
+## ADR-017 — Ordering snapshots and read-only Phase 5 HTTP contract
+Date: 2026-09-23.
+Context: implement order domain/persistence before trustworthy Catalog/Inventory HTTP integration exists.
+Decision: orders own immutable product name/price/quantity snapshots and external customer/product IDs.
+Bound orders to 100 input lines and 1–1000 units per distinct product; merge duplicate IDs only when
+their snapshots agree. Prices use USD decimal values with the same range/precision as the Catalog contract.
+Totals are derived from immutable lines in Domain and SQL, avoiding independently mutable total columns.
+Orders start Pending. Allow Pending -> Confirmed/Rejected/Cancelled, Confirmed -> Cancelled;
+Rejected/Cancelled are terminal. Repeating the current non-Pending status is a no-op preserving its reason.
+Rejection requires a bounded reason. Invalid transitions leave state unchanged. These are local state rules,
+not a claim that stock was reserved/released. Later workflows must coordinate these changes with Inventory.
+EF persists the aggregate atomically; status commands lock the current order row in a transaction before
+Domain validation. Dapper supplies details and paginated customer history from ordering_db only.
+Expose GET routes only in Phase 5. Trusted in-process creation accepts priced snapshots for seed/tests;
+never bind that command to a public request. Define narrow ICatalogServiceClient/IInventoryServiceClient
+contracts for Phase 6, without implementations, network calls or production fake prices/stock.
+Reason: demonstrate aggregate consistency/history without allowing unverified client prices or implying checkout.
+Alternatives: public create with submitted prices (breaks price authority), cross-database reads (breaks ownership),
+early HTTP clients (Phase 6 scope), stored editable totals (can drift), automatic confirmation (no reservation yet).
+Consequences: customer identity/ownership is not authenticated until Phase 9; current GETs are localhost learning.
+No public create/cancel/status endpoints, reservation messaging, Outbox/Inbox or creation idempotency yet.
+Explicit deterministic Development seed demonstrates pending/history states; it preserves existing orders.
+Validation: 108 tests passed (37 new Ordering checks), including totals, snapshots, aggregate rollback,
+status races, stale tracked-state refresh, customer history and absence of HTTP writes. Full build and
+seven-host smoke checks passed. Ordering migration/seed touched only ordering_db. Unrestricted parallel
+MSBuild exhausted local memory; bounded build concurrency resolved it without dropping test coverage.

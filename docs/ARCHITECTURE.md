@@ -185,7 +185,7 @@ separate from application credentials. All 12 cross-service connection attempts 
 Volumes are microshop_postgres_data and microshop_rabbitmq_data; RabbitMQ keeps a stable hostname.
 Bootstrap scripts create no application tables. See [Docker runbook](docker.md) for actual lifecycle tests.
 ConnectionStrings__Database is the per-service setting, prepared by Set-ServiceEnvironment.ps1.
-Catalog and Inventory consume and validate it; Identity/Ordering skeletons do not consume database settings yet.
+Catalog, Inventory and Ordering consume and validate it; Identity's skeleton does not consume database settings yet.
 Phase 3 adds Product/Category, CatalogService, command-specific ICatalogWriter/EfCatalogWriter,
 ICatalogReader/DapperCatalogReader and CatalogDbContext. Domain/Application remain package-free.
 Catalog and Inventory have separate application tables; category/product foreign keys stay inside Catalog.
@@ -194,6 +194,10 @@ IInventoryReader/DapperInventoryReader. OnHand/Reserved live only in inventory_d
 Stock deltas use a short Read Committed transaction and EF SELECT FOR UPDATE before Domain validation
 and SaveChanges. This prevents lost concurrent deltas and consuming reserved stock; no reservation API yet.
 Inventory ProductId has no Catalog FK or validation lookup. See [Inventory guide](inventory.md) and ADR-016.
+Phase 5 adds Order/OrderItem/status and local snapshots in ordering_db. EF saves complete aggregates and
+serializes status transitions; Dapper serves details/customer history with derived totals. HTTP is read-only.
+Narrow application client contracts exist for Phase 6, without implementations or service calls.
+No public priced-snapshot command is bound to HTTP. See [Ordering guide](ordering.md) and ADR-017.
 Migrations and Development seeding run explicitly, not during HTTP startup. Tests use real PostgreSQL
 with isolated disposable schemas. See [Catalog guide](catalog.md), [database ownership](database-ownership.md)
 and [EF/Dapper data flow](efcore-vs-dapper.md); ADR-015 records validation/concurrency decisions.

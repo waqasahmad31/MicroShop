@@ -5,7 +5,7 @@
 | Catalog | catalog_db / catalog_app | categories, products, __EFMigrationsHistory |
 | Identity | identity_db / identity_app | No application tables yet |
 | Inventory | inventory_db / inventory_app | inventory_items, __EFMigrationsHistory |
-| Ordering | ordering_db / ordering_app | No application tables yet |
+| Ordering | ordering_db / ordering_app | orders, order_items, __EFMigrationsHistory |
 
 Each service migrates only its own database with its own restricted login. Cross-service connections
 are denied; the bootstrap administrator is not an application credential. No service references another
@@ -22,4 +22,8 @@ Inventory's ProductId is a primary key/external identifier, never a Catalog FK. 
 ID, nonnegative OnHand and 0 <= Reserved <= OnHand. Available is derived; row locks protect adjustments.
 Normal development tables use public; integration tests use separate random owned schemas and migration
 histories, then clean them up. No volume resets are part of Phase 3 or 4.
-See [Catalog](catalog.md), [Inventory](inventory.md) and [infrastructure grants](docker.md).
+Ordering migration: `20260923111937_InitialOrdering`. Orders own historical product name/price/quantity
+snapshots. The only FK is order_items.order_id -> orders.id, inside ordering_db; customer/product IDs
+are external values. Header and lines save atomically. Totals are derived from immutable lines.
+No Ordering path queries or modifies Catalog/Inventory databases. Identity remains empty.
+See [Catalog](catalog.md), [Inventory](inventory.md), [Ordering](ordering.md) and [infrastructure grants](docker.md).

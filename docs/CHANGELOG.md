@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-23 — Phase 5
+- Implemented Order/OrderItem, immutable name/price snapshots, exact derived totals and bounded quantities.
+- Added duplicate-line aggregation, Pending/Confirmed/Rejected/Cancelled rules and guarded terminal states.
+- Persisted aggregates atomically with EF; serialized status commands and refreshed stale tracked state.
+- Added Dapper details/customer history, read-only HTTP endpoints, ProblemDetails and Development Swagger.
+- Added Ordering-only migration and repeatable synthetic seed; prepared client interfaces for Phase 6 without HTTP implementations.
+- Added 21 unit/application and 16 real PostgreSQL integration checks; all 108 solution tests pass.
+- Resolved parallel MSBuild memory exhaustion by bounding build concurrency; final full build has zero warnings/errors.
+- Verified seven hosts, blocked Ordering POST, aggregate rollback, state races, ownership and unchanged earlier-service seed data.
+- Updated the learning guides, ADR-017 and handoff; stopped before public checkout/service communication in Phase 6.
+
 ## 2026-09-23 — Phase 4
 - Implemented Inventory item creation, stock deltas and paginated/detail reads in its existing four layers.
 - Enforced on-hand/reserved/available rules and overflow bounds; serialized adjustments with EF transactions/row locks.
