@@ -17,6 +17,9 @@ public sealed class OrderingExceptionHandler(IProblemDetailsService problems, IL
             OrderingValidationException or BadHttpRequestException => StatusCodes.Status400BadRequest,
             OrderingNotFoundException => StatusCodes.Status404NotFound,
             OrderingConflictException or OrderTransitionException => StatusCodes.Status409Conflict,
+            OrderingDependencyException { Failure: DependencyFailure.Timeout } => StatusCodes.Status504GatewayTimeout,
+            OrderingDependencyException { Failure: DependencyFailure.InvalidResponse } => StatusCodes.Status502BadGateway,
+            OrderingDependencyException => StatusCodes.Status503ServiceUnavailable,
             _ => StatusCodes.Status500InternalServerError
         };
         ProblemDetails details = exception is OrderingValidationException validation
@@ -28,6 +31,9 @@ public sealed class OrderingExceptionHandler(IProblemDetailsService problems, IL
             400 => "Request validation failed.",
             404 => "Resource not found.",
             409 => "Ordering conflict.",
+            502 => "A checkout dependency returned an invalid response.",
+            503 => "A checkout dependency is unavailable.",
+            504 => "Checkout timed out.",
             _ => "An unexpected server error occurred."
         };
         details.Detail = exception is OrderingNotFoundException or OrderingConflictException or OrderTransitionException ? exception.Message : null;

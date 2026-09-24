@@ -1,5 +1,29 @@
 # Architecture decisions
 
+## ADR-018 — Authoritative synchronous checkout over bounded HTTP
+Date: 2026-09-24.
+Context: Phase 6 is authorized; Phase 5's priced aggregate operation must remain internal.
+Decision: expose POST /api/orders with customer ID and product IDs/quantities only. Reject unknown JSON
+members, validate all lines and aggregate duplicate IDs before any HTTP calls. Typed IHttpClientFactory
+clients use local response DTOs, configured origins and finite timeouts. Catalog supplies USD price/name;
+Inventory supplies point-in-time availability. Only then save one Pending aggregate in ordering_db.
+Do not retry, follow redirects, write stock, auto-confirm, or hold a database transaction during HTTP calls.
+Use a 3-second per-call timeout, 15-second checkout deadline and 64 KiB response-buffer limit by default.
+Missing products/stock or insufficient stock return 409; invalid input 400; malformed successful dependency
+responses 502; network/non-success dependency responses 503; timeouts 504. Do not relay remote bodies.
+Propagate caller cancellation; cancellation/timeouts near commit can leave an uncertain outcome, so they
+do not authorize retries. Customer ID is explicitly unauthenticated until Phase 9.
+Reason: teach synchronous dependency failures and authoritative snapshots while preserving database ownership.
+Alternatives: caller prices, cross-service SQL, distributed transactions, automatic retries, early reservation
+or gateway work. These break ownership, require idempotency, or exceed this phase.
+Consequences: sequential reads are easy to follow but add latency; the overall deadline bounds large carts.
+Availability can change immediately, including between item checks; orders remain Pending without stock effects.
+No shared REST contracts or service-to-service project references. Integration tests may reference API entry
+points solely to host independently configured services against separate disposable database schemas.
+This supersedes only ADR-017's read-only HTTP stopping point; its aggregate/state/storage rules remain.
+Validation: 141 tests passed; full solution build has zero warnings/errors; seven-host smoke, database
+isolation and unchanged public seed data verified. Exact commands/results are in the Phase 6 record.
+
 Dates are recorded per entry; ADR-001–015 were recorded on 2026-09-22. Supersede decisions with a new ADR; preserve history.
 
 ## ADR-001 — Database per service

@@ -58,5 +58,7 @@ totals from quantity times snapshotted price, so there is no independently edita
 Status commands lock the order row and refresh tracked state before applying Domain transitions. This
 prevents competing outcomes or stale tracked entities from overwriting terminal state. Dapper supplies
 details and customer-filtered history with local snapshot data only. It never joins live product tables.
-The HTTP surface has GETs only; Phase 6 must obtain authoritative Catalog prices before exposing checkout.
-See [Ordering guide](ordering.md) and ADR-017 for contracts, state rules and limits.
+Phase 6 adds POST checkout: Catalog/Inventory HTTP validation completes before EF persistence starts.
+No database transaction spans the network reads. Failed remote checks create no order; an ambiguous commit
+response still needs future idempotency rather than blind retries. See [Ordering guide](ordering.md),
+[request flow](request-flow.md) and ADR-017/018 for contracts, state rules and limits.

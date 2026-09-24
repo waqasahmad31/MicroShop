@@ -1,7 +1,7 @@
 # Implementation plan
 
-Canonical roadmap. Last updated: 2026-09-23. Phases 0–5 are complete; waiting to begin Phase 6.
-Completed authorized work: Phase 5 Ordering. Stop before Phase 6 until instructed to continue.
+Canonical roadmap. Last updated: 2026-09-24. Phases 0–6 are complete; waiting to begin Phase 7.
+Completed authorized work: Phase 6 synchronous service communication. Stop before Phase 7 until instructed to continue.
 Status vocabulary: NOT STARTED, IN PROGRESS, COMPLETED, BLOCKED. Completed phases stay in this file.
 Each phase requires relevant build/tests plus the end-of-phase documentation updates in AGENTS.md.
 
@@ -15,7 +15,7 @@ The intended progression is local fundamentals -> explicit microservice architec
 observability -> .NET Aspire -> Azure managed services -> Infrastructure as Code -> CI/CD ->
 advanced Azure services -> Kubernetes/AKS later.
 Docker and observability develop incrementally in the existing phases; this summary does not renumber them.
-**Phase 6 — Synchronous service communication is the next implementation phase.**
+**Phase 7 — API Gateway is the next implementation phase.**
 Future phases extend the project; they neither replace its local architecture nor authorize early cloud work.
 
 ## Repository layout
@@ -81,6 +81,10 @@ Its Domain/Application remain package-free; no shared persistence project or cro
 Phase 5 Ordering reuses these pinned versions and remains package-free in Domain/Application. Its
 service-client interfaces have no implementations yet. Test-All bounds MSBuild concurrency after a local
 out-of-memory failure; the final full build and 108 tests pass with that configuration.
+Phase 6 implements those typed clients and Pending checkout, adding Microsoft.Extensions.Http 10.0.12
+to Ordering.Infrastructure only. Domain/Application remain package-free. Ordering integration tests also
+reference Catalog.Api and Inventory.Api solely for isolated Kestrel hosting, not production dependencies.
+The Phase 6 suite has 141 tests; prior boundary tests are updated for the newly authorized checkout surface.
 
 ## Ports, databases and infrastructure
 Web 5100; Gateway 5200; Identity 5210; Catalog 5220; Inventory 5230; Ordering 5240; Notification 5250.
@@ -163,7 +167,7 @@ Dependencies: Phase 04 completed.
 Record: [phase-05-ordering.md](phases/phase-05-ordering.md)
 
 ### Phase 06 — Synchronous service communication
-Status: **NOT STARTED**
+Status: **COMPLETED**
 
 Deliverables: Typed Catalog/Inventory clients with IHttpClientFactory, server-side prices, availability check and Pending order creation.
 

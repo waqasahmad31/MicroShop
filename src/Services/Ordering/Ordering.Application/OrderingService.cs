@@ -4,7 +4,7 @@ namespace Ordering.Application;
 
 public sealed class OrderingService(IOrderingReader reader, IOrderingWriter writer, TimeProvider clock)
 {
-    // Internal foundation only. Phase 6 obtains authoritative snapshots before invoking this operation.
+    // Trusted in-process foundation. Checkout obtains authoritative snapshots before invoking this operation.
     public async Task<OrderDetailsDto> CreateFromPricedLinesAsync(Guid customerId, IReadOnlyList<PricedOrderLine>? lines, CancellationToken ct)
     {
         if (lines is null || lines.Count is < 1 or > Order.MaximumLines || lines.Any(x => x is null))

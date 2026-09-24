@@ -1,11 +1,11 @@
 # MicroShop
 
 A step-by-step .NET 10 microservices learning project. This repository currently contains the
-Phases 0–5: planning, skeleton, infrastructure, Catalog, Inventory and Ordering foundations.
+Phases 0–6: planning, skeleton, infrastructure, Catalog, Inventory, Ordering and synchronous checkout.
 Catalog provides product/category CRUD. Inventory provides stock records, safe concurrent adjustments
 and availability reads. Ordering adds immutable order snapshots, totals, local status rules and read-only
 history/details. All three use EF writes, Dapper reads, explicit migrations and development seeds.
-Public checkout and service-to-service HTTP start in Phase 6.
+Checkout now fetches authoritative Catalog prices and checks Inventory over HTTP before saving a Pending order. See [the synchronous communication guide](docs/synchronous-communication.md) for setup and a request example.
 
 Start with [the implementation plan](docs/IMPLEMENTATION_PLAN.md),
 [current status](docs/CURRENT_STATUS.md) and [next steps](docs/NEXT_STEPS.md).
@@ -51,12 +51,12 @@ dotnet build MicroShop.sln --no-restore --disable-build-servers -m:1
 ./scripts/Test-All.ps1
 ```
 
-Verified Phase 5 result: build had **0 warnings/errors** and **108 tests passed** (4 architecture,
-44 unit/application, 60 real PostgreSQL integration). Tests require local `.env` and running PostgreSQL.
+Verified Phase 6 result: build had **0 warnings/errors** and **141 tests passed** (4 architecture,
+48 unit/application, 89 real PostgreSQL integration, including real HTTP checkout/failure flows). Tests require local `.env` and running PostgreSQL.
 Build concurrency is bounded because unrestricted parallel MSBuild exhausted local memory during verification.
 Test-All prepares separate service connections; Test-Catalog remains a compatibility wrapper for the suite.
 On Windows with PowerShell 7.3+, run `./scripts/Test-Skeleton.ps1` after building/applying all three migrations.
-It checks seven hosts, including service database reads, Swagger and Ordering's disabled POST, then stops hosts.
+It checks seven hosts, including service database reads, Swagger and invalid checkout input, then stops hosts.
 It verifies HTTP/bootstrap delivery without automating a browser.
 
 Open MicroShop.sln in an IDE with .NET 10 support, or run any host independently in a terminal:
@@ -88,7 +88,7 @@ The Client project is served by the Web host; do not launch it separately.
 | Identity | http://localhost:5210 | Host identification JSON; OpenAPI JSON |
 | Catalog | http://localhost:5220 | Product/category CRUD; OpenAPI JSON; `/swagger` |
 | Inventory | http://localhost:5230 | Stock creation/adjustments/reads; OpenAPI JSON; `/swagger` |
-| Ordering | http://localhost:5240 | Read-only order details/customer history; OpenAPI; `/swagger` |
+| Ordering | http://localhost:5240 | Pending checkout, order details/customer history; OpenAPI; `/swagger` |
 | Notification | http://localhost:5250 | Host identification JSON; no consumer yet |
 
 In Development, each of the four APIs serves `/openapi/v1.json`.
@@ -124,7 +124,7 @@ Each of Identity, Catalog, Inventory and Ordering has Api, Application, Domain a
 Api references Application and Infrastructure; Application references Domain;
 Infrastructure references Application and Domain. No cross-service project references.
 Web references Web.Client. Gateway, Notification and the three BuildingBlocks start without project references.
-Architecture tests inspect the project graph without referencing service assemblies.
+Architecture tests inspect the project graph without referencing service assemblies. Only the Ordering integration test harness references multiple API entry points to host independent services; production service boundaries remain unchanged.
 
 Catalog, Inventory and Ordering implement their four layers. Identity libraries and BuildingBlocks contain no placeholder classes;
 their use cases and persistence arrive in later phases.
@@ -152,4 +152,4 @@ Actual restore/build/test results are recorded in [current status](docs/CURRENT_
 Docker's Linux engine is now running and both Phase 2 containers are healthy.
 Expected negative permission checks may appear as PostgreSQL connection errors in logs.
 
-Phases 0–5 are complete. Phase 6 synchronous service communication is next and requires an instruction to continue.
+Phases 0–6 are complete. Phase 7 API Gateway is next and requires an instruction to continue.

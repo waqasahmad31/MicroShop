@@ -3,7 +3,8 @@
 Phase 5 implements the order aggregate, local persistence and read-only HTTP history/details.
 An order owns immutable product-name, unit-price and quantity snapshots. It owns customer/product IDs
 as external identifiers, without querying another service database or referencing its Domain project.
-Phase 6 will fetch authoritative prices/availability and expose checkout; Phase 5 has no HTTP writes.
+Phase 6 adds checkout using authoritative Catalog prices and Inventory availability over HTTP.
+See [synchronous communication](synchronous-communication.md) for the three-host setup and request example.
 
 ## Run locally
 
@@ -29,6 +30,7 @@ Low build parallelism is intentional: unrestricted solution testing exhausted lo
 
 | Method | Route | Result |
 |---|---|---|
+| POST | `/api/orders` | Validate checkout using Catalog/Inventory; create Pending order (201 + Location) |
 | GET | `/api/orders/{id}` | Order details and immutable item snapshots |
 | GET | `/api/orders?customerId={id}&page=1&pageSize=20` | Paginated customer order history |
 
@@ -43,11 +45,13 @@ Each item has productId, productName, unitPrice, quantity and lineTotal. Dates u
 History contains the same summary fields without the item collection. Totals are calculated from snapshots.
 Count/page statements are not a frozen transaction snapshot during concurrent order creation.
 
-POST `/api/orders` and PUT on a detail route return 405. There are no create, cancel, confirm, reject or
-arbitrary status-write endpoints. OpenAPI describes GET operations only. This prevents submitted client
-prices from reaching the internal priced-snapshot creation use case before Phase 6 validation exists.
+POST accepts customerId and productId/quantity lines only; unknown fields, including prices, return 400.
+Checkout validates all input and aggregates duplicates before dependency reads; it saves only after all checks
+pass. Missing products/stock or insufficient stock returns 409; dependency errors return 502/503/504.
+PUT on a detail route returns 405; no public cancel, confirm, reject or arbitrary status-write endpoint exists.
+OpenAPI describes reads and checkout. Stock is not reserved, decremented or guaranteed by creating an order.
 
-These reads are unauthenticated localhost learning. CustomerId filtering is not authorization;
+These APIs are unauthenticated localhost learning. CustomerId input/filtering is not authorization;
 Phase 9 must derive customer identity from verified claims and enforce detail/history ownership/admin access.
 
 ## Domain invariants and state transitions
@@ -110,10 +114,11 @@ The only foreign key is order_items.order_id -> orders.id, inside this aggregate
 
 ICatalogServiceClient.GetProductAsync returns ProductId, Name, UnitPrice and Currency or null.
 IInventoryServiceClient.GetAvailabilityAsync returns ProductId and Available or null.
-These narrow Ordering.Application interfaces are explicitly planned for the next phase. There are no
-registered implementations, fake production responses or HTTP requests yet. Phase 6 must validate USD,
-missing products/stock, aggregate cart quantities and obtain server prices before invoking creation.
-Availability checking then creates Pending orders only; it is not a stock reservation.
+Ordering.Infrastructure now registers CatalogServiceClient and InventoryServiceClient through IHttpClientFactory.
+They use configurable origins, bounded calls and local wire DTOs, validate USD/response IDs/required fields,
+and propagate cancellation. CheckoutService aggregates input and checks stock before invoking creation.
+Availability checking creates Pending orders only; it is not a stock reservation. See ADR-018 and
+[the request flow](request-flow.md) for timeouts, error mapping and commit uncertainty.
 
 ## Database and deterministic examples
 
@@ -148,5 +153,8 @@ can leave a disposable test schema; inspect ownership before cleanup.
 Ordering tests cover exact/max totals, snapshot copying, duplicate aggregation, quantity/price limits,
 state transitions/no-op outcomes, aggregate rollback on an invalid item, customer history isolation,
 concurrent incompatible outcomes, refreshing stale tracked state and seed preservation. HTTP tests
-verify ProblemDetails, absence of write routes and GET-only OpenAPI/Swagger. The previous suites also run.
-Smoke checks start/stop seven actual HTTP hosts and verify Ordering reads and rejected POST, without browser automation.
+verify ProblemDetails, rejection of submitted prices and absence of public status writes. Phase 6 tests run
+real Kestrel hosts with independent database schemas, covering checkout, authoritative snapshots, stock
+checks, dependency failures and cancellation. The previous suites also run.
+Smoke checks start/stop seven actual HTTP hosts and verify Ordering reads and invalid checkout input,
+without browser automation. The integration suite verifies valid checkout through all three services.

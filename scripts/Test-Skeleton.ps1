@@ -120,7 +120,7 @@ foreach ($hostToCheck in $hostsToCheck) {
             $swagger = Invoke-WebRequest -Uri "$url/swagger/index.html" -TimeoutSec 5
             if ($swagger.Content -notmatch 'swagger-ui') { throw 'Ordering Swagger UI is unavailable.' }
             $create = Invoke-WebRequest -Uri "$url/api/orders" -Method Post -ContentType 'application/json' -Body '{}' -SkipHttpErrorCheck -TimeoutSec 5
-            if ($create.StatusCode -ne 405) { throw 'Ordering exposed checkout before Phase 6.' }
+            if ($create.StatusCode -ne 400) { throw 'Ordering did not validate the empty checkout request.' }
         }
 
         Write-Output "PASS $($hostToCheck.Name) ($url)"

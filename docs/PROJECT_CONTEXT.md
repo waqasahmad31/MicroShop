@@ -35,13 +35,13 @@ Business pages arrive in Phase 8, security in Phase 9, messaging in Phase 10, ob
 Earlier phases are local exercises with documented limitations, not secure or reliable deployment claims.
 
 ## Authorization and continuation
-Phases 0–5 are complete. Catalog implements product/category CRUD; Inventory implements stock items
+Phases 0–6 are complete. Catalog implements product/category CRUD; Inventory implements stock items
 and safe adjustments; Ordering implements immutable snapshots, totals, local status rules and read-only
 details/history. All three use EF writes, Dapper reads and isolated real PostgreSQL tests.
-Ordering has no public checkout or service HTTP clients until Phase 6; reservation workflows remain Phase 11.
+Ordering now exposes Pending checkout through typed Catalog/Inventory HTTP clients, using authoritative prices and point-in-time availability. Stock reservation workflows remain Phase 11.
 Explicit migrations/development seeds are available. The public repository is
 https://github.com/waqasahmad31/MicroShop, with detailed phase-wise commits.
-Do not start Phase 6 automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
+Do not start Phase 7 automatically. Read CURRENT_STATUS and NEXT_STEPS for the verified stopping point.
 
 ## Long-term learning roadmap (future context only)
 - LOCAL / CORE MICROSERVICES LEARNING: Phases 0–18 retain the explicit local architecture.

@@ -120,10 +120,11 @@ Keep the private key outside source and containers' public assets. Rotate/revoke
 reject reuse atomically and revoke the token family. Persistent sessions/cookie-BFF architecture are deferred.
 
 ## Orders
-Synchronous lesson (Phase 6): browser -> Gateway -> Ordering -> Catalog price lookup ->
+Synchronous lesson (Phase 6): direct caller -> Ordering -> Catalog price lookup ->
 Inventory availability -> Ordering EF transaction. Store validated item snapshots in ordering_db.
 An availability check does not reserve stock. Pending orders remain unconfirmed in this lesson,
 with the UI explaining the learning-stage behavior. Do not claim stock-safe checkout.
+Gateway forwarding and browser checkout extend this flow in Phases 7/8.
 
 Async lesson (Phase 11):
 ```mermaid
@@ -195,9 +196,16 @@ Stock deltas use a short Read Committed transaction and EF SELECT FOR UPDATE bef
 and SaveChanges. This prevents lost concurrent deltas and consuming reserved stock; no reservation API yet.
 Inventory ProductId has no Catalog FK or validation lookup. See [Inventory guide](inventory.md) and ADR-016.
 Phase 5 adds Order/OrderItem/status and local snapshots in ordering_db. EF saves complete aggregates and
-serializes status transitions; Dapper serves details/customer history with derived totals. HTTP is read-only.
-Narrow application client contracts exist for Phase 6, without implementations or service calls.
-No public priced-snapshot command is bound to HTTP. See [Ordering guide](ordering.md) and ADR-017.
+serializes status transitions; Dapper serves details/customer history with derived totals.
+Phase 6 adds POST checkout and typed IHttpClientFactory clients for Catalog/Inventory, with startup-validated
+origin URLs, per-call timeouts, a total checkout deadline and cancellation propagation. Unknown checkout
+properties are rejected. All quantities are validated/aggregated before remote reads. Missing/insufficient
+products/stock return 409; invalid responses 502, unavailable dependencies 503, timeouts 504.
+No public priced-snapshot command is bound to HTTP. The aggregate is saved only after all checks pass,
+without holding a database transaction across network calls. Stock is unchanged; status remains Pending.
+Production projects retain their original boundaries; Ordering integration tests reference Catalog/Inventory
+API entry points solely to host three separate Kestrel services with isolated database roles/schemas.
+See [Ordering guide](ordering.md), [request flow](request-flow.md) and ADR-017/018.
 Migrations and Development seeding run explicitly, not during HTTP startup. Tests use real PostgreSQL
 with isolated disposable schemas. See [Catalog guide](catalog.md), [database ownership](database-ownership.md)
 and [EF/Dapper data flow](efcore-vs-dapper.md); ADR-015 records validation/concurrency decisions.

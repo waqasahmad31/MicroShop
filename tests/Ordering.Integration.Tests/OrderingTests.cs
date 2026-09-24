@@ -91,21 +91,21 @@ public sealed class OrderingTests(OrderingFixture fixture) : IClassFixture<Order
         var db = scope.ServiceProvider.GetRequiredService<OrderingDbContext>();
         var before = await db.Orders.CountAsync();
         var payload = new { customerId = OrderingSeedData.CustomerId, items = new[] { new { productId = Guid.NewGuid(), unitPrice = 0.01m, quantity = 1 } } };
-        await Problem(await Client.PostAsJsonAsync(Orders, payload), HttpStatusCode.MethodNotAllowed);
+        await Problem(await Client.PostAsJsonAsync(Orders, payload), HttpStatusCode.BadRequest);
         await Problem(await Client.PutAsJsonAsync($"{Orders}/{OrderingSeedData.PendingOrderId}", new { status = "Confirmed" }), HttpStatusCode.MethodNotAllowed);
         await Problem(await Client.PostAsJsonAsync($"{Orders}/{OrderingSeedData.PendingOrderId}/cancel", new { }), HttpStatusCode.NotFound);
         Assert.Equal(before, await db.Orders.CountAsync());
         using var openapi = JsonDocument.Parse(await Client.GetStringAsync("/openapi/v1.json"));
         foreach (var path in openapi.RootElement.GetProperty("paths").EnumerateObject())
         {
-            Assert.False(path.Value.TryGetProperty("post", out _));
+            if (path.Name.TrimEnd('/') != Orders) Assert.False(path.Value.TryGetProperty("post", out _));
             Assert.False(path.Value.TryGetProperty("put", out _));
             Assert.False(path.Value.TryGetProperty("patch", out _));
             Assert.False(path.Value.TryGetProperty("delete", out _));
         }
         Assert.Contains("swagger-ui", await Client.GetStringAsync("/swagger/index.html"));
-        Assert.Null(scope.ServiceProvider.GetService<ICatalogServiceClient>());
-        Assert.Null(scope.ServiceProvider.GetService<IInventoryServiceClient>());
+        Assert.IsType<CatalogServiceClient>(scope.ServiceProvider.GetRequiredService<ICatalogServiceClient>());
+        Assert.IsType<InventoryServiceClient>(scope.ServiceProvider.GetRequiredService<IInventoryServiceClient>());
     }
 
     [Fact]

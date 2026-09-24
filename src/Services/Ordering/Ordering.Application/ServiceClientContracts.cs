@@ -1,6 +1,6 @@
 namespace Ordering.Application;
 
-// Phase 6 implements these contracts with typed HTTP clients. No stubs/fallback prices are registered.
+// Infrastructure implements these contracts over HTTP using local wire DTOs, never service project references.
 public sealed record CatalogProductSnapshot(Guid ProductId, string Name, decimal UnitPrice, string Currency);
 public sealed record InventoryAvailability(Guid ProductId, int Available);
 public interface ICatalogServiceClient

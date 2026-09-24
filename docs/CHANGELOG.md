@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-24 — Phase 6
+- Added POST /api/orders accepting IDs/quantities only; reject unknown fields and aggregate duplicate products before reads.
+- Fetch authoritative Catalog snapshots and Inventory availability through typed IHttpClientFactory clients.
+- Validate downstream IDs, required fields, USD prices and stock arithmetic; save one Pending aggregate only after all checks.
+- Added configurable origins, per-call/overall deadlines, body-size bounds, cancellation and sanitized 409/502/503/504 responses.
+- Keep stock unchanged, no automatic retries/redirects, no transaction across HTTP calls, no new migration or messaging.
+- Added four application and 29 real HTTP/PostgreSQL checks; all 141 tests pass with no failures/skips.
+- Verified complete solution build, seven hosts, database ownership and preservation of development data.
+- Recovered Docker Desktop startup by preserving/renaming stale socket-only runtime directories; no volume reset.
+- Added request-flow and synchronous-communication guides, ADR-018 and updated handoff. Stop before Phase 7.
+
 ## 2026-09-23 — Phase 5
 - Implemented Order/OrderItem, immutable name/price snapshots, exact derived totals and bounded quantities.
 - Added duplicate-line aggregation, Pending/Confirmed/Rejected/Cancelled rules and guarded terminal states.
